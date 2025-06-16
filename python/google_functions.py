@@ -1,9 +1,7 @@
 from google.cloud import storage
-from dotenv import load_dotenv
 import json
 import os 
 
-load_dotenv(".env")
 
 bucket_name = os.getenv("BUCKET_NAME")
 storage_client = storage.Client()
