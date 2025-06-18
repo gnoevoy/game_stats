@@ -12,7 +12,7 @@ bucket = storage_client.bucket(bucket_name)
 
 def write_to_bucket(blob_name, data):
     blob = bucket.blob(blob_name)
-    content = json.dumps(data, indent=4)
+    content = json.dumps(data, indent=4, ensure_ascii=False)
     blob.upload_from_string(content, content_type="application/json")
 
 
