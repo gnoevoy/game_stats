@@ -1,5 +1,6 @@
 from scripts.google_functions import write_to_bucket, read_from_bucket
 from bs4 import BeautifulSoup
+import traceback
 import requests
 import os
 
@@ -21,7 +22,6 @@ def get_general_info(player_id, home_page):
         "player_id": player_id,
         "player_name": left_table[1].text.strip(),
         "steam_id": left_table[3].text.strip(),
-        "activity": right_table[1].text.strip(),
         "rank": right_table[3].text.strip(),
         "experience": right_table[2].text.strip(),
         "frags": right_table[10].text.strip(),
@@ -43,14 +43,22 @@ def get_player_actions(player_id, home_page):
     soup = BeautifulSoup(content, "html.parser")
 
     tables = soup.find_all("table", class_="data-table")
-    actions_table = tables[0].find_all("tr")
-    side_peak_table = tables[1].find_all("tr")
 
-    # Extract players actions stats with side peaks
-    actions = [action.text.strip() for action in actions_table[2:]]
-    side_peak = {"CT_side": side_peak_table[1].text.strip(), "T_side": side_peak_table[2].text.strip()}
-    dct = {"actions": actions, "side_peak": side_peak}
-    return dct
+    # Check if the element exists, if player doesnt played last 28 days, there will be no records
+    if tables:
+        actions_table = tables[0].find_all("tr")
+        side_peak_table = tables[1].find_all("tr")
+
+        # Extract players actions stats with side peaks and check if they exist
+        actions = [action.text.strip() for action in actions_table[2:]] if len(actions_table) > 2 else []
+        side_peak = {
+            "CT_side": side_peak_table[1].text.strip() if len(side_peak_table) > 1 else 0,
+            "T_side": side_peak_table[2].text.strip() if len(side_peak_table) > 2 else 0,
+        }
+        dct = {"actions": actions, "side_peak": side_peak}
+        return dct
+
+    return {}
 
 
 def get_weapons_stats(player_id, home_page):
@@ -60,13 +68,16 @@ def get_weapons_stats(player_id, home_page):
     soup = BeautifulSoup(content, "html.parser")
 
     table = soup.find("table", class_="data-table")
-    dct = {}
 
-    for row in table.find_all("tr")[1:]:
-        # Get weapon name from the image
-        weapon_name = row.find("img")["src"].split("/")[-1][:-4]
-        dct[weapon_name] = row.text.strip()
-    return dct
+    if table:
+        weapons = {}
+        for row in table.find_all("tr")[1:]:
+            # Get weapon name from the image
+            weapon_name = row.find("img")["src"].split("/")[-1][:-4]
+            weapons[weapon_name] = row.text.strip()
+        return {"weapons_stats": weapons}
+
+    return {"weapons_stats": {}}
 
 
 def get_frags_stats(player_id, home_page):
@@ -87,37 +98,52 @@ def get_frags_stats(player_id, home_page):
         soup = BeautifulSoup(content, "html.parser")
         table = soup.find("table", class_="data-table")
 
-        frags = []
-        for row in table.find_all("tr")[1:]:
-            # Get the killed player ID for identification
-            killed_player_id = row.find("a")["href"].split("=")[-1]
-            values = [killed_player_id, row.text.strip()]
-            frags.append(values)
+        if table:
+            frags = []
+            for row in table.find_all("tr")[1:]:
+                # Get the killed player ID for identification
+                killed_player_id = row.find("a")["href"].split("=")[-1]
+                value = " ; ".join([killed_player_id, row.text.strip()])
+                frags.append(value)
 
-        lst.extend(frags)
-        num += 1
+            lst.extend(frags)
+            num += 1
+        else:
+            break
 
-    return {"frags_stats": lst}
+    return lst
 
 
-# Cover function to get all players data
 def get_players_data():
+    print("02. Scraping players data ...")
     # Get players profile links from bucket
-    links = read_from_bucket("players_list")
+    links = read_from_bucket("top_100_players")
     home_page = os.getenv("BASE_URL")
-    players_data = []
+    players_data, frags_data = [], {}
 
     # Iterate through the player links and fetch their data
-    for link in links[:1]:
-        player_id = link.split("=")[-1]
+    for i, link in enumerate(links, start=1):
+        # If something goes wrong, skip this player and display an error message
+        try:
+            player_id = link.split("=")[-1]
 
-        general_info = get_general_info(player_id, home_page)
-        player_actions = get_player_actions(player_id, home_page)
-        weapons_stats = get_weapons_stats(player_id, home_page)
-        player_frags = get_frags_stats(player_id, home_page)
+            # Gather data and store in 2 lists
+            general_info = get_general_info(player_id, home_page)
+            player_actions = get_player_actions(player_id, home_page)
+            weapons_stats = get_weapons_stats(player_id, home_page)
+            player_frags = get_frags_stats(player_id, home_page)
 
-        player_info = {**general_info, **player_actions, **weapons_stats, **player_frags}
-        players_data.append(player_info)
+            player_info = {**general_info, **player_actions, **weapons_stats}
+            players_data.append(player_info)
+            frags_data[player_id] = player_frags
+            print(f"{i}/100, Player {player_id} scraped")
+
+        except:
+            print(f"Failed to scrape data for player {player_id}, {link}")
+            traceback.print_exc()
+            continue
 
     # Write data to bucket
     write_to_bucket("players_data", players_data)
+    write_to_bucket("frags_data", frags_data)
+    print("Data successfully written to bucket")

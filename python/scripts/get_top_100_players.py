@@ -42,5 +42,5 @@ def get_players_links():
 
     print(f"Scraped {len(players)} / 100 links")
     # Write data to bucket
-    write_to_bucket("players_list", players)
+    write_to_bucket("top_100_players", players)
     print("Data successfully written to bucket")
