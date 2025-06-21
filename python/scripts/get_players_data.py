@@ -5,7 +5,10 @@ import requests
 import os
 
 
-# There are 4 helper functions to extract data from different pages of player profile
+# There are 6 helper functions to extract data from different pages of player profile
+# All functions have almost the same logic: make request -> render HTML content -> find elements ->  scrape data -> save in variable
+
+
 def get_general_info(player_id, home_page):
     # Make request and parse the HTML content
     url = f"{home_page}hlstats.php?mode=playerinfo&type=ajax&game=css&tab=general_aliases&player={player_id}"
@@ -114,6 +117,59 @@ def get_frags_stats(player_id, home_page):
     return lst
 
 
+# Get my profile sessions
+def get_my_sessions(player_id, home_page):
+    url = f"{home_page}hlstats.php?mode=playersessions&player={player_id}"
+    response = requests.get(url)
+    content = response.content
+    soup = BeautifulSoup(content, "html.parser")
+
+    table = soup.find("table", class_="data-table")
+
+    if table:
+        sessions = []
+        for row in table.find_all("tr")[1:]:
+            session = row.text.strip()
+            sessions.append(session)
+        return {"sessions": sessions}
+
+    return {"sessions": []}
+
+
+# Extract events history with timestamps for my profile
+def get_my_games_events(player_id, home_page):
+    num = 1
+    lst = []
+
+    # Use infinite loop because there are many pages, breaking condition is when page does not exist or table is empty
+    while True:
+        url = f"{home_page}hlstats.php?mode=playerhistory&player={player_id}&page={num}"
+        response = requests.get(url)
+
+        # Check if the page exists
+        if response.status_code != 200:
+            break
+
+        content = response.content
+        soup = BeautifulSoup(content, "html.parser")
+        table = soup.find("table", class_="data-table")
+
+        # Check if table has records
+        if table and len(table.find_all("tr")) > 1:
+            events = []
+            for row in table.find_all("tr")[1:]:
+                event = row.text.strip()
+                events.append(event)
+
+            lst.extend(events)
+            num += 1
+        else:
+            break
+
+    return lst
+
+
+# Final function to put everything together
 def get_players_data():
     print("02. Scraping players data ...")
     # Get players profile links from bucket
@@ -121,11 +177,31 @@ def get_players_data():
     home_page = os.getenv("BASE_URL")
     players_data, frags_data = [], {}
 
+    # Extract my own stats firstly, since I could not be present in the top 100 players
+    # Dont use error handling because this data is essential
+    my_id = 4720
+    my_general_info = get_general_info(my_id, home_page)
+    my_actions = get_player_actions(my_id, home_page)
+    my_weapons_stats = get_weapons_stats(my_id, home_page)
+    my_frags = get_frags_stats(my_id, home_page)
+    my_session = get_my_sessions(my_id, home_page)
+    my_game_events = get_my_games_events(my_id, home_page)
+
+    my_info = {**my_general_info, **my_actions, **my_weapons_stats, **my_session}
+    players_data.append(my_info)
+    frags_data[my_id] = my_frags
+    print("My stats successfully scraped")
+
     # Iterate through the player links and fetch their data
     for i, link in enumerate(links, start=1):
         # If something goes wrong, skip this player and display an error message
         try:
             player_id = link.split("=")[-1]
+
+            # Skip my own profile to avoid duplication
+            if player_id == my_id:
+                print(f"{i}/100, Already get my own stats")
+                continue
 
             # Gather data and store in 2 lists
             general_info = get_general_info(player_id, home_page)
@@ -146,4 +222,5 @@ def get_players_data():
     # Write data to bucket
     write_to_bucket("players_data", players_data)
     write_to_bucket("frags_data", frags_data)
+    write_to_bucket("game_events", my_game_events)
     print("Data successfully written to bucket")
