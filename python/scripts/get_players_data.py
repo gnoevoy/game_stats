@@ -61,7 +61,7 @@ def get_player_actions(player_id, home_page):
         dct = {"actions": actions, "side_peak": side_peak}
         return dct
 
-    return {}
+    return {"actons": [], "side_peak": {"CT_side": 0, "T_side": 0}}
 
 
 def get_weapons_stats(player_id, home_page):
@@ -199,11 +199,11 @@ def get_players_data():
             player_id = link.split("=")[-1]
 
             # Skip my own profile to avoid duplication
-            if player_id == my_id:
+            if int(player_id) == my_id:
                 print(f"{i}/100, Already get my own stats")
                 continue
 
-            # Gather data and store in 2 lists
+            # Gather data
             general_info = get_general_info(player_id, home_page)
             player_actions = get_player_actions(player_id, home_page)
             weapons_stats = get_weapons_stats(player_id, home_page)
@@ -220,7 +220,7 @@ def get_players_data():
             continue
 
     # Write data to bucket
-    write_to_bucket("players_data", players_data)
-    write_to_bucket("frags_data", frags_data)
-    write_to_bucket("game_events", my_game_events)
+    write_to_bucket("raw/players_data", players_data)
+    write_to_bucket("raw/frags_data", frags_data)
+    write_to_bucket("raw/game_events", my_game_events)
     print("Data successfully written to bucket, 3 json files")
