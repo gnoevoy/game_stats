@@ -223,4 +223,4 @@ def get_players_data():
     write_to_bucket("players_data", players_data)
     write_to_bucket("frags_data", frags_data)
     write_to_bucket("game_events", my_game_events)
-    print("Data successfully written to bucket")
+    print("Data successfully written to bucket, 3 json files")
