@@ -61,7 +61,7 @@ def get_player_actions(player_id, home_page):
         dct = {"actions": actions, "side_peak": side_peak}
         return dct
 
-    return {"actons": [], "side_peak": {"CT_side": 0, "T_side": 0}}
+    return {"actions": [], "side_peak": {"CT_side": 0, "T_side": 0}}
 
 
 def get_weapons_stats(player_id, home_page):
