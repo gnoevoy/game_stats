@@ -1,5 +1,5 @@
 from functions.data_func import get_all_time_and_latest_month_results, get_actions, get_weapons, get_sessions, create_side_peak_cols
-from functions.google_func import write_to_bucket, read_from_bucket
+from functions.google_func import write_to_bucket, read_from_bucket, write_to_bigquery
 import pandas as pd
 
 
@@ -91,3 +91,11 @@ def transform_data():
     write_to_bucket("clean/frags", frags, file_type="csv")
     write_to_bucket("clean/events", events, file_type="csv")
     print("Data successfully written to the bucket, 6 csv files")
+
+
+def load_tables_to_bigquery():
+    print("04. LOADING DATA TO BIGQUERY ...")
+    tables = ["actions", "events", "frags", "players", "sessions", "weapons"]
+    for table in tables:
+        write_to_bigquery(f"clean/{table}", table)
+    print("Data successfully loaded to BigQuery, 6 tables")

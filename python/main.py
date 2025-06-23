@@ -5,7 +5,7 @@ load_dotenv(".env")
 
 from scripts.get_top_100_players import get_players_links
 from scripts.get_players_data import get_players_data
-from scripts.data_transformations import transform_data
+from scripts.data_transformations import transform_data, load_tables_to_bigquery
 
 
 def main():
@@ -13,6 +13,7 @@ def main():
         get_players_links()
         get_players_data()
         transform_data()
+        load_tables_to_bigquery()
     except:
         traceback.print_exc()
 
