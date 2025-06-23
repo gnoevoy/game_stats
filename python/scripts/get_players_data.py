@@ -171,7 +171,7 @@ def get_my_games_events(player_id, home_page):
 
 # Final function to put everything together
 def get_players_data():
-    print("02. Scraping players data ...")
+    print("02. SCRAPING PLAYERS DATA ...")
     # Get players profile links from bucket
     links = read_from_bucket("top_100_players")
     home_page = os.getenv("BASE_URL")

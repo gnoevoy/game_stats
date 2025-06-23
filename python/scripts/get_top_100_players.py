@@ -21,7 +21,7 @@ def get_links(content, home_page):
 
 
 def get_players_links():
-    print("01. Scraping top 100 players ...")
+    print("01. SCRAPING TOP 100 PLAYERS ...")
     # Initialize list to store links and set up base URL
     players = []
     home_page = os.getenv("BASE_URL")
