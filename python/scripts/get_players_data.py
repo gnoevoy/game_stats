@@ -1,4 +1,4 @@
-from scripts.google_functions import write_to_bucket, read_from_bucket
+from functions.google_func import write_to_bucket, read_from_bucket
 from bs4 import BeautifulSoup
 import traceback
 import requests
@@ -203,7 +203,6 @@ def get_players_data():
                 print(f"{i}/100, Already get my own stats")
                 continue
 
-            # Gather data
             general_info = get_general_info(player_id, home_page)
             player_actions = get_player_actions(player_id, home_page)
             weapons_stats = get_weapons_stats(player_id, home_page)
