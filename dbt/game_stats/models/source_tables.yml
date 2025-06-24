@@ -1,0 +1,13 @@
+version: 2
+
+sources:
+  - name: game_stats 
+    database: global-grammar-449122-b6 
+    schema: game_stats
+    tables:
+      - name: actions
+      - name: events
+      - name: frags
+      - name: players
+      - name: sessions
+      - name: weapons
