@@ -1,4 +1,4 @@
-from functions.players_func import get_general_info, get_player_actions, get_weapons_stats, get_frags_stats, get_my_sessions, get_my_games_events
+from functions.scraper_func import get_general_info, get_player_actions, get_weapons_stats, get_frags_stats, get_my_sessions, get_my_games_events
 from functions.google_func import write_to_bucket, read_from_bucket
 import traceback
 import os

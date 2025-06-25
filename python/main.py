@@ -10,10 +10,10 @@ from scripts.data_transformations import transform_data, load_tables_to_bigquery
 
 def main():
     try:
-        # get_players_links()
-        # get_players_data()
+        get_players_links()
+        get_players_data()
         transform_data()
-        # load_tables_to_bigquery()
+        load_tables_to_bigquery()
     except:
         traceback.print_exc()
 

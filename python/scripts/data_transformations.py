@@ -1,6 +1,8 @@
-from functions.data_func import get_all_time_and_latest_month_results, get_actions, get_weapons, get_sessions, create_side_peak_cols
+from functions.data_func import get_all_time_and_latest_month_results, get_actions, get_weapons, get_names, create_side_peak_cols
 from functions.google_func import write_to_bucket, read_from_bucket, write_to_bigquery
+from datetime import timedelta, datetime
 import pandas as pd
+import pytz
 
 
 # Main function to create 4 different tables
@@ -24,16 +26,16 @@ def transform_players_data(data):
     df = get_all_time_and_latest_month_results(df, "headshots", "all_time_headshots", "last_month_headshots")
     df = create_side_peak_cols(df)
 
-    # Create seperate tables for actions, weapons and sessions
+    # Create seperate tables for names, actions, weapons and sessions
+    names = get_names(df)
     actions = get_actions(df)
     weapons = get_weapons(df)
-    sessions = get_sessions(df)
 
     # Remove raw columns
-    cols_to_remove = ["frags", "deaths", "headshots", "actions", "side_peak", "weapons_stats", "sessions"]
+    cols_to_remove = ["frags", "deaths", "headshots", "actions", "side_peak", "weapons_stats", "used_names"]
     df.drop(columns=cols_to_remove, inplace=True)
 
-    return df, actions, weapons, sessions
+    return df, actions, weapons, names
 
 
 # Create frags table
@@ -60,42 +62,80 @@ def transform_events_data(data):
     df = pd.DataFrame(data, columns=["value"])
 
     values = df["value"].str.split("\n")
+    # Convert to Warsaw time
     df["timestamp"] = pd.to_datetime(values.str[0].str.strip())
+    df["timestamp"] = df["timestamp"] - timedelta(hours=1)
     df["event"] = values.str[1].str.strip()
     df["description"] = values.str[2].str.strip().str.replace(".", "")
 
+    # Filter out unwanted events
+    df = df[~df["event"].isin(["Team Bonus", "Action"])]
     df.drop(columns=["value"], inplace=True)
+    return df
+
+
+# Create my sessions table
+def transform_sessions_data(data):
+    df = pd.DataFrame(data, columns=["value"])
+
+    values = df["value"].str.split("\n")
+    df["date"] = values.str[0].astype("datetime64[ns]")
+    df["experience_change"] = values.str[1].astype(int)
+    df["experience"] = values.str[2].str.replace(",", "").astype(int)
+    df["frags"] = values.str[4].astype(int)
+    df["deaths"] = values.str[5].astype(int)
+    df["headshots"] = values.str[7].astype(int)
+
+    # Retrive time played in minutes
+    time_played = values.str[3].str.split().str[-1].str[:-1]
+    df["time_played_in_minutes"] = round(pd.to_timedelta(time_played).dt.seconds / 60, 0).astype(int)
+    df.drop(columns=["value"], inplace=True)
+
+    return df
+
+
+# Create a timestamp to know at what time the data is valid
+def get_timestamp_table():
+    warsaw_tz = pytz.timezone("Europe/Warsaw")
+    warsaw_time = datetime.now(warsaw_tz)
+    df = pd.DataFrame({"valid_at": [warsaw_time]})
     return df
 
 
 # Wrapper function to combine all together
 def transform_data():
     print("03. STARTING DATA TRANSFORMATION ...")
+
     # Load json files from the bucket
     players_data = read_from_bucket("raw/players_data")
     frags_data = read_from_bucket("raw/frags_data")
     events_data = read_from_bucket("raw/game_events")
+    sessions_data = read_from_bucket("raw/my_sessions")
     print("Raw json files successfully uploaded")
 
     # Final tables
-    players, actions, weapons, sessions = transform_players_data(players_data)
+    players, actions, weapons, names = transform_players_data(players_data)
     frags = transform_frags_data(frags_data)
     events = transform_events_data(events_data)
-    print("Data transformation completed, created 6 tables")
+    sessions = transform_sessions_data(sessions_data)
+    timestamp = get_timestamp_table()
+    print("Data transformation completed, created 8 tables")
 
     # Write dataframes as csv files to the bucket
     write_to_bucket("clean/players", players, file_type="csv")
     write_to_bucket("clean/actions", actions, file_type="csv")
     write_to_bucket("clean/weapons", weapons, file_type="csv")
+    write_to_bucket("clean/names", names, file_type="csv")
     write_to_bucket("clean/sessions", sessions, file_type="csv")
     write_to_bucket("clean/frags", frags, file_type="csv")
     write_to_bucket("clean/events", events, file_type="csv")
-    print("Data successfully written to the bucket, 6 csv files")
+    write_to_bucket("clean/timestamp", timestamp, file_type="csv")
+    print("Data successfully written to the bucket")
 
 
 def load_tables_to_bigquery():
     print("04. LOADING DATA TO BIGQUERY ...")
-    tables = ["actions", "events", "frags", "players", "sessions", "weapons"]
+    tables = ["actions", "events", "frags", "players", "sessions", "weapons", "names", "timestamp"]
     for table in tables:
         write_to_bigquery(f"clean/{table}", table)
-    print("Data successfully loaded to BigQuery, 6 tables")
+    print("Data successfully loaded to BigQuery")

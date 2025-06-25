@@ -1,3 +1,4 @@
+from datetime import timedelta
 import pandas as pd
 
 
@@ -21,6 +22,21 @@ def create_side_peak_cols(df):
     df["ct_side_peaks"] = df["ct_side_peaks"].apply(lambda x: int(x.split("\n")[2]) if isinstance(x, str) else x)
     df["t_side_peaks"] = df["t_side_peaks"].apply(lambda x: int(x.split("\n")[2]) if isinstance(x, str) else x)
     return df
+
+
+# Get seperated table for players names
+def get_names(df):
+    names = df[["player_id", "used_names"]]
+    names = names.explode("used_names").dropna()
+
+    values = names["used_names"].str.split("\n")
+    names["name"] = values.str[1].str.strip()
+    # Convert to Warszaw time
+    names["last_used"] = pd.to_datetime(values.str[3].str.strip())
+    names["last_used"] = names["last_used"] - timedelta(hours=1)
+
+    names.drop(columns=["used_names"], inplace=True)
+    return names
 
 
 # Get separate table for player actions
@@ -69,23 +85,3 @@ def get_weapons(df):
     weapons.drop(columns=["value"], inplace=True)
 
     return weapons
-
-
-# Get separate table for my profile sessions
-def get_sessions(df):
-    sessions = pd.DataFrame(df["sessions"].dropna()[0], columns=["values"])
-
-    values = sessions["values"].str.split("\n")
-    sessions["date"] = values.str[0].astype("datetime64[ns]")
-    sessions["experience_change"] = values.str[1].astype(int)
-    sessions["experience"] = values.str[2].str.replace(",", "").astype(int)
-    sessions["frags"] = values.str[4].astype(int)
-    sessions["deaths"] = values.str[5].astype(int)
-    sessions["headshots"] = values.str[7].astype(int)
-
-    # Retrive time played in minutes
-    time_played = values.str[3].str.split().str[-1].str[:-1]
-    sessions["time_played_in_minutes"] = round(pd.to_timedelta(time_played).dt.seconds / 60, 0).astype(int)
-    sessions.drop(columns=["values"], inplace=True)
-
-    return sessions
