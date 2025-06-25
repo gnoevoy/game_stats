@@ -11,3 +11,5 @@ sources:
       - name: players
       - name: sessions
       - name: weapons
+      - name: names
+      - name: timestamp
