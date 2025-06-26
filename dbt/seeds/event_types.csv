@@ -1,0 +1,8 @@
+event_type_id,event
+1,Connect
+2,Death
+3,Disconnect
+4,Entry
+5,Kill
+6,Suicide
+7,Team

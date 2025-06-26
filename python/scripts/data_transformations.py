@@ -5,7 +5,7 @@ import pandas as pd
 import pytz
 
 
-# Main function to create 4 different tables
+# Function to create 4 different tables from players json file
 def transform_players_data(data):
     df = pd.DataFrame(data)
 
@@ -133,6 +133,7 @@ def transform_data():
     print("Data successfully written to the bucket")
 
 
+# Final step in python script, load everything to BigQuery
 def load_tables_to_bigquery():
     print("04. LOADING DATA TO BIGQUERY ...")
     tables = ["actions", "events", "frags", "players", "sessions", "weapons", "names", "timestamp"]

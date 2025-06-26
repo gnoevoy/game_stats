@@ -1,6 +1,7 @@
 from dotenv import load_dotenv
 import traceback
 
+# Load variables before importing scripts to have access to values
 load_dotenv(".env")
 
 from scripts.get_top_100_players import get_players_links

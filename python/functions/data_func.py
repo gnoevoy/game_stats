@@ -2,6 +2,9 @@ from datetime import timedelta
 import pandas as pd
 
 
+# There're helper functions to json file with players various data (creates new columns and 3 additional tables)
+
+
 # Reusable function to extract frags, deaths, and headshots data
 def get_all_time_and_latest_month_results(df, col, col1_name, col2_name):
     values = df[col].str.split("\t").str[-1].str.split()

@@ -32,4 +32,8 @@ clean-targets:         # directories to be removed by `dbt clean`
 models:
   game_stats:
     +materialized: table
-    +schema: analytics_game_stats
+    +schema: analytics
+
+seeds:
+  game_stats:
+    +schema: analytics

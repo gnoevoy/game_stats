@@ -4,7 +4,6 @@ import traceback
 import os
 
 
-# Final function to put everything together
 def get_players_data():
     print("02. SCRAPING PLAYERS DATA ...")
     # Get players profile links from bucket
@@ -43,6 +42,7 @@ def get_players_data():
             weapons_stats = get_weapons_stats(player_id, home_page)
             player_frags = get_frags_stats(player_id, home_page)
 
+            # Append values to final lst and dct
             player_info = {**general_info, **player_actions, **weapons_stats}
             players_data.append(player_info)
             frags_data[player_id] = player_frags
