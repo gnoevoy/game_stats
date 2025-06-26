@@ -1,6 +1,6 @@
 from functions.data_func import get_all_time_and_latest_month_results, get_actions, get_weapons, get_names, create_side_peak_cols
 from functions.google_func import write_to_bucket, read_from_bucket, write_to_bigquery
-from datetime import timedelta, datetime
+from datetime import datetime
 import pandas as pd
 import pytz
 
@@ -60,17 +60,20 @@ def transform_frags_data(data):
 # Create events table for my profile
 def transform_events_data(data):
     df = pd.DataFrame(data, columns=["value"])
-
     values = df["value"].str.split("\n")
-    # Convert to Warsaw time
+
+    # Convert to Moscow time since server located in this region
     df["timestamp"] = pd.to_datetime(values.str[0].str.strip())
-    df["timestamp"] = df["timestamp"] - timedelta(hours=1)
+    moscow_tz = pytz.timezone("Europe/Moscow")
+    df["timestamp"] = df["timestamp"].dt.tz_localize(moscow_tz)
+
     df["event"] = values.str[1].str.strip()
     df["description"] = values.str[2].str.strip().str.replace(".", "")
 
     # Filter out unwanted events
     df = df[~df["event"].isin(["Team Bonus", "Action"])]
     df.drop(columns=["value"], inplace=True)
+
     return df
 
 
@@ -115,8 +118,8 @@ def transform_data():
 
     # Final tables
     players, actions, weapons, names = transform_players_data(players_data)
-    frags = transform_frags_data(frags_data)
     events = transform_events_data(events_data)
+    frags = transform_frags_data(frags_data)
     sessions = transform_sessions_data(sessions_data)
     timestamp = get_timestamp_table()
     print("Data transformation completed, created 8 tables")

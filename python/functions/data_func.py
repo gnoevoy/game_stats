@@ -1,5 +1,5 @@
-from datetime import timedelta
 import pandas as pd
+import pytz
 
 
 # There're helper functions to json file with players various data (creates new columns and 3 additional tables)
@@ -34,9 +34,11 @@ def get_names(df):
 
     values = names["used_names"].str.split("\n")
     names["name"] = values.str[1].str.strip()
-    # Convert to Warszaw time
+
+    # Convert to Moscow time since server located in this region
     names["last_used"] = pd.to_datetime(values.str[3].str.strip())
-    names["last_used"] = names["last_used"] - timedelta(hours=1)
+    moscow_tz = pytz.timezone("Europe/Moscow")
+    names["last_used"] = names["last_used"].dt.tz_localize(moscow_tz)
 
     names.drop(columns=["used_names"], inplace=True)
     return names

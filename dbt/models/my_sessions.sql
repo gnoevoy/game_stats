@@ -14,11 +14,9 @@ with cte as (
    from {{ source('game_stats', 'sessions') }} 
 )
 
-select 
-    ROW_NUMBER() OVER (ORDER BY date ASC) AS session_id,
-    cte.*
+select *
 from cte
 {% if is_incremental() %}
     where date > (select max(date) from {{ this }})
 {% endif %}
-order by session_id asc
+order by date desc

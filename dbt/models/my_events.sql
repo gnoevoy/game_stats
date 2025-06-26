@@ -2,19 +2,18 @@
 
 with cte as (
    select
-       timestamp,
-       t2.event_type_id,
-       description
-   from {{ source('game_stats', 'events') }} as t1
-   left join {{ ref('event_types') }} as t2 
+        timestamp as utc_timestamp,
+        {{ poland_time("timestamp") }} as poland_timestamp,
+        t2.event_type_id,
+        description
+    from {{ source('game_stats', 'events') }} as t1
+    left join {{ ref('event_types') }} as t2 
         on t1.event = t2.event
 )
 
-select 
-    ROW_NUMBER() OVER (ORDER BY timestamp ASC) AS event_id,
-    cte.*
+select *
 from cte
 {% if is_incremental() %}
-    where timestamp > (select max(timestamp) from {{ this }})
+    where utc_timestamp > (select max(utc_timestamp) from {{ this }})
 {% endif %}
-order by event_id asc
+order by utc_timestamp desc
