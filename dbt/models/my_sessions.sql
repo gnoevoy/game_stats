@@ -1,7 +1,7 @@
--- Incremental table that appens new session for my profile 
--- or uptates existting ones if there was some change
+-- Incremental table that appends new session (day summary) and updates existing ones for my profile
+-- Dont use conditional logic in incremental model because source data is quite small (30 rows),
 
-{{ config(materialized='incremental', unique_key='date') }}
+{{ config( materialized='incremental', unique_key='date',) }}
 
 with cte as (
    select
@@ -19,6 +19,3 @@ with cte as (
 
 select *
 from cte
-{% if is_incremental() %}
-    where date > (select max(date) from {{ this }})
-{% endif %}
