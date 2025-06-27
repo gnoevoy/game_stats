@@ -1,3 +1,5 @@
+-- Store unique weapons with ID's
+
 with cte as (
     select distinct weapon
     from {{ source('game_stats', 'weapons') }}

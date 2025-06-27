@@ -1,7 +1,9 @@
+-- Store unique actions with ID's
+
 with cte as (
     select
         distinct
-        {# split column and extract values #}
+        -- Split string column and extract data
         trim(split(action_name, "-")[safe_offset(0)]) as action,
         trim(split(action_name, "-")[safe_offset(1)]) as description,
     from {{ source('game_stats', 'actions') }}

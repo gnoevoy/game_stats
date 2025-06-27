@@ -1,5 +1,7 @@
 version: 2
 
+# Import all tables which came from python script
+
 sources:
   - name: game_stats 
     database: global-grammar-449122-b6 

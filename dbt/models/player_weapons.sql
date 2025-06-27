@@ -1,3 +1,5 @@
+-- Table that shows individual weapon stats by a player for the last 30 days
+
 with cte as (
     select
         player_id,

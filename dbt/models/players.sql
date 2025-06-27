@@ -1,3 +1,6 @@
+-- Main table that shows player statistics
+-- Added metrics, activity indicator and check if a player has one nickname
+
 with players_with_several_names as (
     select distinct player_id
     from {{ ref('player_names') }}

@@ -1,3 +1,6 @@
+-- Table that shows used names by a player
+-- Dont contain users who only used one nickname in the server
+
 with cte as (
     select *, ROW_NUMBER() OVER (PARTITION BY player_id ORDER BY last_used DESC) AS rank
     from {{ source('game_stats', 'names') }}
