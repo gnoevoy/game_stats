@@ -1,0 +1,14 @@
+services:
+
+  python_script:
+    build:
+      context: ./python
+      dockerfile: Dockerfile
+
+    # Load env variables and auth for Google Cloud
+    env_file:
+      - ./python/.env
+    volumes:
+      - ./python/gcloud_key.json:/script/gcloud_key.json
+    environment:
+      - GOOGLE_APPLICATION_CREDENTIALS=/script/gcloud_key.json

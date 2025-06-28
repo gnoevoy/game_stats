@@ -48,6 +48,9 @@ def get_players_data():
             frags_data[player_id] = player_frags
             print(f"{i}/100, Player {player_id} scraped")
 
+        except KeyboardInterrupt:
+            traceback.print_exc()
+            exit(0)
         except:
             print(f"Failed to scrape data for player {player_id}, {link}")
             traceback.print_exc()

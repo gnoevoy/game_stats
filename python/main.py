@@ -1,8 +1,11 @@
 from dotenv import load_dotenv
+from pathlib import Path
 import traceback
 
-# Load variables before importing scripts to have access to values
-load_dotenv(".env")
+# Import env variable on local execution
+env_file = Path(".env")
+if env_file.exists():
+    load_dotenv(env_file)
 
 from scripts.get_top_100_players import get_players_links
 from scripts.get_players_data import get_players_data
@@ -15,6 +18,9 @@ def main():
         get_players_data()
         transform_data()
         load_tables_to_bigquery()
+    except KeyboardInterrupt:
+        traceback.print_exc()
+        exit(0)
     except:
         traceback.print_exc()
 

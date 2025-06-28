@@ -1,5 +1,4 @@
-from google.cloud import bigquery
-from google.cloud import storage
+from google.cloud import bigquery, storage
 import json
 import os
 

@@ -11,4 +11,6 @@ logs/
 
 # Env
 venv/
-requirements.txt
+
+# Google Cloud
+gcloud_key.json
