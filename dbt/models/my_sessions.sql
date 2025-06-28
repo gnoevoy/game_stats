@@ -1,4 +1,4 @@
--- Incremental table that appends new session (day summary) and updates existing ones for my profile
+-- Incremental table that appends new sessions (day summary basically) and updates existing ones for my profile
 -- Dont use conditional logic in incremental model because source data is quite small (30 rows),
 
 {{ config( materialized='incremental', unique_key='date',) }}

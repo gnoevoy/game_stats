@@ -67,6 +67,9 @@ def transform_events_data(data):
     moscow_tz = pytz.timezone("Europe/Moscow")
     df["timestamp"] = df["timestamp"].dt.tz_localize(moscow_tz)
 
+    # Important column to sort events if several actions happened at the same time
+    df["event_seq_num"] = df.groupby("timestamp").cumcount() + 1
+
     df["event"] = values.str[1].str.strip()
     df["description"] = values.str[2].str.strip().str.replace(".", "")
 

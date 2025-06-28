@@ -1,11 +1,9 @@
-tasks:
-3. test if incremental models actually workds
-2. dbt features yml files, remove unused features, explore functionality
+
+3. What can I do with snaphosts, some interesting data?
+    --> test it as well
 
 
-** Learn how to schedule scripts in cloud, what options are
+--> move on to google clodu schedule (workflows, cloud run, docker, scheduler)
 
-
-tests (yml file), snapshot, usefull commands
 
 

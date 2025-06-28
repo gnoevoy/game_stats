@@ -1,6 +1,6 @@
--- Incremental table that append new events (logs) about my actions on the server.
+-- Table that containts logs about my actions on the server (different events like connections, kill ...)
+-- Also incrementaly append new events by combined id, since some events may occur at the same time.
 
--- Use combination of columns to uniquely identify each event (several events may appear at the same time).
 {{ config(materialized='incremental', unique_key=['utc_timestamp', "description"]) }}
 
 with cte as (
@@ -8,6 +8,7 @@ with cte as (
         timestamp as utc_timestamp,
         -- Convert time to the local timezone
         {{ poland_time("timestamp") }} as poland_timestamp,
+        event_seq_num, 
         t2.event_type_id,
         description
     from {{ source('game_stats', 'events') }} as t1
