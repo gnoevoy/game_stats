@@ -1,5 +1,11 @@
-*** sessions updates on 00:00 my moscow time (date in moscow time)
---> need to check sessions, events and snapshot after several days of gamees and sroting records
+dbt
+--> test events, sessions and snapshots
+--> create a container and test it
+
+
+--> push container to registry -> google cloud run job -> workflow
+
+
 
 -----------------------------------------
 
