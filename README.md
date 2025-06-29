@@ -1,16 +1,15 @@
 dbt
---> test events, sessions and snapshots
---> create a container and test it
+0. use env variables in profile.yml
+1. create second profile for running in docker code (additional profile, set path, set target, mount json file)
+
+>> clean up my code 
+dockerignore, files etc ...
 
 
---> push container to registry -> google cloud run job -> workflow
+test again everything: docker python, dbt -> push to registry, test there 
+** learn how to automate this process, building an image, pushing, provide env variables for cloud run jobs
 
-
-
------------------------------------------
-
-learn google cloud automation
---> move on to google clodu schedule (workflows, cloud run, docker, scheduler)
+next move on to workflow orchestration with scheduler
 
 
 

@@ -11,6 +11,7 @@ logs/
 
 # Env
 venv/
+env/
 
 # Google Cloud
 gcloud_key.json

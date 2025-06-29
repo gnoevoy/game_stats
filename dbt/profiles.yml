@@ -1,0 +1,13 @@
+game_stats:
+  outputs:
+    dev:
+      dataset: game_stats
+      job_execution_timeout_seconds: 300
+      job_retries: 1
+      location: EU
+      method: oauth
+      priority: interactive
+      project: global-grammar-449122-b6
+      threads: 60
+      type: bigquery
+  target: dev
