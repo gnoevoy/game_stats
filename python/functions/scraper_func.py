@@ -54,7 +54,17 @@ def get_player_actions(player_id, home_page):
     tables = soup.find_all("table", class_="data-table")
 
     # Check if the element exists, if player doesnt played last 28 days, there will be no records
-    if tables:
+    # Tricky part where may be 2 or 1 table on a web page
+
+    if len(tables) == 1:
+        side_peak_table = tables[0].find_all("tr")
+        side_peak = {
+            "CT_side": side_peak_table[1].text.strip() if len(side_peak_table) > 1 else 0,
+            "T_side": side_peak_table[2].text.strip() if len(side_peak_table) > 2 else 0,
+        }
+        return {"actions": [], "side_peak": side_peak}
+
+    elif tables:
         actions_table = tables[0].find_all("tr")
         side_peak_table = tables[1].find_all("tr")
 

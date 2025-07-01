@@ -2,6 +2,7 @@ from functions.data_func import get_all_time_and_latest_month_results, get_actio
 from functions.google_func import write_to_bucket, read_from_bucket, write_to_bigquery
 from datetime import datetime
 import pandas as pd
+import logging
 import pytz
 
 
@@ -110,14 +111,15 @@ def get_timestamp_table():
 
 # Wrapper function to combine all together
 def transform_data():
-    print("03. STARTING DATA TRANSFORMATION ...")
+    logger = logging.getLogger(__name__)
+    logger.info("03. STARTING DATA TRANSFORMATION ...")
 
     # Load json files from the bucket
     players_data = read_from_bucket("raw/players_data")
     frags_data = read_from_bucket("raw/frags_data")
     events_data = read_from_bucket("raw/game_events")
     sessions_data = read_from_bucket("raw/my_sessions")
-    print("Raw json files successfully uploaded")
+    logger.info("Raw json files successfully uploaded")
 
     # Final tables
     players, actions, weapons, names = transform_players_data(players_data)
@@ -125,7 +127,7 @@ def transform_data():
     frags = transform_frags_data(frags_data)
     sessions = transform_sessions_data(sessions_data)
     timestamp = get_timestamp_table()
-    print("Data transformation completed, created 8 tables")
+    logger.info("Data transformation completed, created 8 tables")
 
     # Write dataframes as csv files to the bucket
     write_to_bucket("clean/players", players, file_type="csv")
@@ -136,13 +138,15 @@ def transform_data():
     write_to_bucket("clean/frags", frags, file_type="csv")
     write_to_bucket("clean/events", events, file_type="csv")
     write_to_bucket("clean/timestamp", timestamp, file_type="csv")
-    print("Data successfully written to the bucket")
+    logger.info("Data successfully written to the bucket")
 
 
 # Final step in python script, load everything to BigQuery
 def load_tables_to_bigquery():
-    print("04. LOADING DATA TO BIGQUERY ...")
+    logger = logging.getLogger(__name__)
+    logger.info("04. LOADING DATA TO BIGQUERY ...")
+
     tables = ["actions", "events", "frags", "players", "sessions", "weapons", "names", "timestamp"]
     for table in tables:
         write_to_bigquery(f"clean/{table}", table)
-    print("Data successfully loaded to BigQuery")
+    logger.info("Data successfully loaded to BigQuery")

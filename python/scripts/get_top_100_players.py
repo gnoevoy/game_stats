@@ -1,6 +1,7 @@
 from functions.google_func import write_to_bucket
 from bs4 import BeautifulSoup
 import requests
+import logging
 import os
 
 
@@ -21,7 +22,9 @@ def get_links(content, home_page):
 
 
 def get_players_links():
-    print("01. SCRAPING TOP 100 PLAYERS ...")
+    logger = logging.getLogger(__name__)
+    logger.info("01. SCRAPING TOP 100 PLAYERS ...")
+
     # Initialize list to store links and set up base URL
     players = []
     home_page = os.getenv("BASE_URL")
@@ -40,7 +43,7 @@ def get_players_links():
 
         page_num += 1
 
-    print(f"Scraped {len(players)} / 100 links")
+    logger.info(f"Scraped {len(players)} / 100 links")
     # Write data to bucket
     write_to_bucket("top_100_players", players)
-    print("Data successfully written to bucket")
+    logger.info("Data successfully written to bucket")
