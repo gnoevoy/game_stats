@@ -9,7 +9,7 @@ with cte as (
         -- Convert time to the local timezone
         {{ poland_time("timestamp") }} as poland_timestamp,
 
-        -- This columns allows to sort events correctly when some occurs at the sama time, the lowest value will be the last event 
+        -- This columns allows to sort events correctly when some events occurs at the sama time, the lowest value will be the last event 
         event_seq_num, 
 
         t2.event_type_id,

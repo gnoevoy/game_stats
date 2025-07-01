@@ -3,6 +3,8 @@
 
 {% snapshot top_players_history %}
 
+-- Use check strategy to append new records only when rank changes
+
 {{
    config(
        target_schema='game_stats_analytics',

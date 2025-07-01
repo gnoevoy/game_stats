@@ -21,10 +21,10 @@ def setup_logging():
     )
 
 
+# Combine together ETL logic
 def main():
-    logger = logging.getLogger(__name__)
-
     try:
+        logger = logging.getLogger(__name__)
         get_players_links()
         get_players_data()
         transform_data()
@@ -36,5 +36,4 @@ def main():
 
 
 if __name__ == "__main__":
-    setup_logging()
     main()

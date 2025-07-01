@@ -1,14 +1,18 @@
 steps:
 
   # Python
-  - name: gcr.io/cloud-builders/docker
+
+  - id: "build docker image for python script from git repo"
+    name: gcr.io/cloud-builders/docker
     args: ["build", "-t", "$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/python-script:$COMMIT_SHA", "."]
     dir: "python/"
-  
-  - name: gcr.io/cloud-builders/docker
+
+  - id: "push python image to cloud registry" 
+    name: gcr.io/cloud-builders/docker
     args: ["push", "$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/python-script:$COMMIT_SHA"]
 
-  - name: gcr.io/google.com/cloudsdktool/cloud-sdk
+  - id: "deploy python script to cloud run, update existing job"
+    name: gcr.io/google.com/cloudsdktool/cloud-sdk
     entrypoint: gcloud
     args:
       - beta
@@ -23,14 +27,20 @@ steps:
 
 
   # DBT
-  - name: gcr.io/cloud-builders/docker
+
+  - id: "build docker image for dbt script from git repo"
+    name: gcr.io/cloud-builders/docker
     args: ["build", "-t", "$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/dbt-script:$COMMIT_SHA", "."]
     dir: "dbt/"
   
-  - name: gcr.io/cloud-builders/docker
+
+  - id: "push dbt image to cloud registry" 
+    name: gcr.io/cloud-builders/docker
     args: ["push", "$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/dbt-script:$COMMIT_SHA"]
 
-  - name: gcr.io/google.com/cloudsdktool/cloud-sdk
+
+  - id: "deploy dbt script to cloud run, update existing job"
+    name: gcr.io/google.com/cloudsdktool/cloud-sdk
     entrypoint: gcloud
     args:
       - beta
@@ -44,10 +54,12 @@ steps:
       - $_DEPLOY_REGION
 
 
-  # Deploy the workflow
-  - id: 'deploy-workflow'
+  # Deploy the workflow 
+
+  - id: "deploy workflow with the latest images"
     name: 'gcr.io/cloud-builders/gcloud'
-    args: ['workflows', 'deploy', '$_WORKFLOW_NAME-$BRANCH_NAME', '--source', 'cloud/workflow.yml']   
+    args: ['workflows', 'deploy', '$_WORKFLOW_NAME', '--source', 'cloud/workflow.yml']   
+
 
 options:
   logging: CLOUD_LOGGING_ONLY

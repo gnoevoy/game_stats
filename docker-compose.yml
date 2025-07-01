@@ -1,21 +1,16 @@
 services:
 
+  # Test python script in Docker container
   python_script:
     image: python_script
     build:
       context: ./python
       dockerfile: Dockerfile
 
-    # Load env variables and connect to cloud
+    # Load env variables and secrets on runtime
     env_file:
       - ./python/.env
     volumes:
       - ./gcloud_key.json:/script/gcloud_key.json
     environment:
       - GOOGLE_APPLICATION_CREDENTIALS=/script/gcloud_key.json
-
-  dbt_script:
-    image: dbt_script
-    build:
-      context: ./dbt
-      dockerfile: Dockerfile
