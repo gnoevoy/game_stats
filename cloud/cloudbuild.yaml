@@ -1,25 +1,25 @@
 steps:
 
   # Python
-  # - name: gcr.io/cloud-builders/docker
-  #   args: ["build", "-t", "$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/python-script:$COMMIT_SHA", "."]
-  #   dir: "python/"
+  - name: gcr.io/cloud-builders/docker
+    args: ["build", "-t", "$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/python-script:$COMMIT_SHA", "."]
+    dir: "python/"
   
-  # - name: gcr.io/cloud-builders/docker
-  #   args: ["push", "$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/python-script:$COMMIT_SHA"]
+  - name: gcr.io/cloud-builders/docker
+    args: ["push", "$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/python-script:$COMMIT_SHA"]
 
-  # - name: gcr.io/google.com/cloudsdktool/cloud-sdk
-  #   entrypoint: gcloud
-  #   args:
-  #     - run
-  #     - deploy
-  #     - python-script
-  #     - '--image'
-  #     - '$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/python-script:$COMMIT_SHA'
-  #     - '--region'
-  #     - $_DEPLOY_REGION
-  #     - '--platform'
-  #     - $_PLATFORM
+  - name: gcr.io/google.com/cloudsdktool/cloud-sdk
+    entrypoint: gcloud
+    args:
+      - beta
+      - run
+      - jobs
+      - deploy
+      - python-script
+      - '--image'
+      - '$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/python-script:$COMMIT_SHA'
+      - '--region'
+      - $_DEPLOY_REGION
 
 
   # DBT
@@ -42,13 +42,11 @@ steps:
       - '$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/dbt-script:$COMMIT_SHA'
       - '--region'
       - $_DEPLOY_REGION
-      # - '--platform'
-      # - $_PLATFORM
     
 
 options:
   logging: CLOUD_LOGGING_ONLY
 
 images:
-#   - '$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/python-script:$COMMIT_SHA'
+  - '$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/python-script:$COMMIT_SHA'
   - '$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/dbt-script:$COMMIT_SHA'
