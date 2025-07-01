@@ -42,7 +42,12 @@ steps:
       - '$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/dbt-script:$COMMIT_SHA'
       - '--region'
       - $_DEPLOY_REGION
-    
+
+
+  # Deploy the workflow
+  - id: 'deploy-workflow'
+    name: 'gcr.io/cloud-builders/gcloud'
+    args: ['workflows', 'deploy', '$_WORKFLOW_NAME-$BRANCH_NAME', '--source', 'cloud/workflow.yml']   
 
 options:
   logging: CLOUD_LOGGING_ONLY
