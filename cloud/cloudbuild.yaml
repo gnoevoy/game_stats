@@ -1,10 +1,20 @@
 steps:
+
+  # Python
   - name: gcr.io/cloud-builders/docker
     args: ["build", "-t", "$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/python-script:$COMMIT_SHA", "."]
     dir: "python/"
   
   - name: gcr.io/cloud-builders/docker
     args: ["push", "$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/python-script:$COMMIT_SHA"]
+
+  # DBT
+  - name: gcr.io/cloud-builders/docker
+    args: ["build", "-t", "$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/dbt-script:$COMMIT_SHA", "."]
+    dir: "dbt/"
+  
+  - name: gcr.io/cloud-builders/docker
+    args: ["push", "$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/dbt-script:$COMMIT_SHA"]
 
 options:
   logging: CLOUD_LOGGING_ONLY
