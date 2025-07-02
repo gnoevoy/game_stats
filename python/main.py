@@ -10,21 +10,15 @@ if env_file.exists():
 from scripts.get_top_100_players import get_players_links
 from scripts.get_players_data import get_players_data
 from scripts.data_transformations import transform_data, load_tables_to_bigquery
+from functions.logger import setup_logging
 
 
-# Set up logging configuration
-def setup_logging():
-    logging.basicConfig(
-        level=logging.INFO,
-        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-        datefmt="%Y-%m-%d %H:%M:%S",
-    )
+logger = logging.getLogger(__name__)
 
 
-# Combine together ETL logic
+# ETL logic
 def main():
     try:
-        logger = logging.getLogger(__name__)
         get_players_links()
         get_players_data()
         transform_data()
