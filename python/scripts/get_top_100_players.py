@@ -5,6 +5,9 @@ import logging
 import os
 
 
+logger = logging.getLogger(__name__)
+
+
 def get_links(content, home_page):
     # Parse page content and extract profile links
     soup = BeautifulSoup(content, "html.parser")
@@ -22,7 +25,6 @@ def get_links(content, home_page):
 
 
 def get_players_links():
-    logger = logging.getLogger(__name__)
     logger.info("01. SCRAPING TOP 100 PLAYERS ...")
 
     # Initialize list to store links and set up base URL

@@ -4,8 +4,10 @@ import logging
 import os
 
 
+logger = logging.getLogger(__name__)
+
+
 def get_players_data():
-    logger = logging.getLogger(__name__)
     logger.info("02. SCRAPING PLAYERS DATA ...")
 
     # Get players profile links from bucket

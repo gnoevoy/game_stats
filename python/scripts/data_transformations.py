@@ -6,6 +6,9 @@ import logging
 import pytz
 
 
+logger = logging.getLogger(__name__)
+
+
 # Function to create 4 different tables from players json file
 def transform_players_data(data):
     df = pd.DataFrame(data)
@@ -111,7 +114,6 @@ def get_timestamp_table():
 
 # Wrapper function to combine all together
 def transform_data():
-    logger = logging.getLogger(__name__)
     logger.info("03. STARTING DATA TRANSFORMATION ...")
 
     # Load json files from the bucket

@@ -13,16 +13,9 @@ main:
         args:
           name: ${"namespaces/" + project_id + "/jobs/" + "python-script"}
           location: ${region}
-        result: python_script_output
 
     - dbt_script:
         call: googleapis.run.v1.namespaces.jobs.run
         args:
           name: ${"namespaces/" + project_id + "/jobs/" + "dbt-script"}
           location: ${region}
-        result: dbt_script_output
-
-    - finish:
-        return:
-            python_script: ${python_script_output}
-            dbt_script: ${dbt_script_output}
