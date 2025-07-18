@@ -1,9 +1,8 @@
 from bs4 import BeautifulSoup
 import requests
 
-
-# There are 6 helper functions to extract data from different pages of player profile
-# All functions have almost the same logic: make request -> render HTML content -> find elements ->  scrape data -> save in variable
+# There are 4 helper functions for all players and 3 for my profile
+# All functions have almost the same logic: make request -> render HTML content -> find elements ->  scrape data -> save it as a variable
 
 
 def get_general_info(player_id, home_page):
@@ -13,17 +12,18 @@ def get_general_info(player_id, home_page):
     content = response.content
     soup = BeautifulSoup(content, "html.parser")
 
-    # Extract basic stats + used names in the server
+    # Extract tables with content
     tables = soup.find_all("table", class_="data-table")
     left_table = tables[0].find_all("tr")
     right_table = tables[1].find_all("tr")
 
-    # Check if the names table exists
+    # Get player used names, if they exist
     names = []
     if len(tables) > 8:
         names_table = tables[8].find_all("tr")
         for row in names_table[1:]:
-            name = row.text.strip()
+            value = row.text.strip()
+            name = {"player_id": player_id, "value": value}
             names.append(name)
 
     dct = {
@@ -36,12 +36,8 @@ def get_general_info(player_id, home_page):
         "deaths": right_table[11].text.strip(),
         "headshots": right_table[9].text.strip(),
         "frags_per_minute": right_table[4].text.strip(),
-        "kill_streak": right_table[12].text.strip(),
-        "death_streak": right_table[13].text.strip(),
-        "suicides": right_table[14].text.strip(),
-        "used_names": names,
     }
-    return dct
+    return dct, names
 
 
 def get_player_actions(player_id, home_page):
@@ -50,34 +46,40 @@ def get_player_actions(player_id, home_page):
     response = requests.get(url)
     content = response.content
     soup = BeautifulSoup(content, "html.parser")
-
     tables = soup.find_all("table", class_="data-table")
 
-    # Check if the element exists, if player doesnt played last 28 days, there will be no records
-    # Tricky part where may be 2 or 1 table on a web page
+    # Player actions for the last 30 days
 
-    if len(tables) == 1:
+    actions = []
+    ct_side, t_side = None, None
+
+    # Check if element exists
+    if not tables:
+        return actions, ct_side, t_side
+
+    # If there's only one table, scrape team peaks
+    elif len(tables) == 1:
         side_peak_table = tables[0].find_all("tr")
-        side_peak = {
-            "CT_side": side_peak_table[1].text.strip() if len(side_peak_table) > 1 else 0,
-            "T_side": side_peak_table[2].text.strip() if len(side_peak_table) > 2 else 0,
-        }
-        return {"actions": [], "side_peak": side_peak}
+        ct_side = side_peak_table[1].text.strip() if len(side_peak_table) > 1 else None
+        t_side = side_peak_table[2].text.strip() if len(side_peak_table) > 2 else None
+        return actions, ct_side, t_side
 
-    elif tables:
+    # Otherwise, scrape everything
+    else:
         actions_table = tables[0].find_all("tr")
         side_peak_table = tables[1].find_all("tr")
 
-        # Extract players actions stats with side peaks and check if they exist
-        actions = [action.text.strip() for action in actions_table[2:]] if len(actions_table) > 2 else []
-        side_peak = {
-            "CT_side": side_peak_table[1].text.strip() if len(side_peak_table) > 1 else 0,
-            "T_side": side_peak_table[2].text.strip() if len(side_peak_table) > 2 else 0,
-        }
-        dct = {"actions": actions, "side_peak": side_peak}
-        return dct
+        ct_side = side_peak_table[1].text.strip() if len(side_peak_table) > 1 else None
+        t_side = side_peak_table[2].text.strip() if len(side_peak_table) > 2 else None
 
-    return {"actions": [], "side_peak": {"CT_side": 0, "T_side": 0}}
+        # Get actions
+        if len(actions_table) > 2:
+            for row in actions_table[2:]:
+                value = row.text.strip()
+                action = {"player_id": player_id, "action": value}
+                actions.append(action)
+
+        return actions, ct_side, t_side
 
 
 def get_weapons_stats(player_id, home_page):
@@ -85,18 +87,20 @@ def get_weapons_stats(player_id, home_page):
     response = requests.get(url)
     content = response.content
     soup = BeautifulSoup(content, "html.parser")
-
     table = soup.find("table", class_="data-table")
 
-    if table:
-        weapons = {}
-        for row in table.find_all("tr")[1:]:
-            # Get weapon name from the image
-            weapon_name = row.find("img")["src"].split("/")[-1][:-4]
-            weapons[weapon_name] = row.text.strip()
-        return {"weapons_stats": weapons}
+    weapons = []
 
-    return {"weapons_stats": {}}
+    if table:
+        for row in table.find_all("tr")[1:]:
+            # Get weapon name from the image + stats
+            weapon_name = row.find("img")["src"].split("/")[-1][:-4]
+            value = row.text.strip()
+            weapon_stats = {"player_id": player_id, "weapon_name": weapon_name, "value": value}
+            weapons.append(weapon_stats)
+        return weapons
+
+    return weapons
 
 
 def get_frags_stats(player_id, home_page):
@@ -117,18 +121,19 @@ def get_frags_stats(player_id, home_page):
         soup = BeautifulSoup(content, "html.parser")
         table = soup.find("table", class_="data-table")
 
-        if table:
+        if not table:
+            break
+        else:
             frags = []
             for row in table.find_all("tr")[1:]:
                 # Get the killed player ID for identification
                 killed_player_id = row.find("a")["href"].split("=")[-1]
-                value = " ; ".join([killed_player_id, row.text.strip()])
-                frags.append(value)
+                value = row.text.strip()
+                frag = {"player_id": player_id, "killed_player_id": killed_player_id, "value": value}
+                frags.append(frag)
 
             lst.extend(frags)
             num += 1
-        else:
-            break
 
     return lst
 
@@ -139,15 +144,14 @@ def get_my_sessions(player_id, home_page):
     response = requests.get(url)
     content = response.content
     soup = BeautifulSoup(content, "html.parser")
-
     table = soup.find("table", class_="data-table")
-    sessions = []
 
+    sessions = []
     if table:
         for row in table.find_all("tr")[1:]:
             session = row.text.strip()
-            sessions.append(session)
-
+            dct = {"value": session}
+            sessions.append(dct)
     return sessions
 
 
@@ -156,7 +160,7 @@ def get_my_games_events(player_id, home_page):
     num = 1
     lst = []
 
-    # Use infinite loop because there are many pages, breaking condition is when page does not exist or table is empty
+    # Loop over unknown amount of pages and extract logs
     while True:
         url = f"{home_page}hlstats.php?mode=playerhistory&player={player_id}&page={num}"
         response = requests.get(url)
@@ -174,7 +178,8 @@ def get_my_games_events(player_id, home_page):
             events = []
             for row in table.find_all("tr")[1:]:
                 event = row.text.strip()
-                events.append(event)
+                dct = {"value": event}
+                events.append(dct)
 
             lst.extend(events)
             num += 1
@@ -182,3 +187,19 @@ def get_my_games_events(player_id, home_page):
             break
 
     return lst
+
+
+# Combine all helper functions to scrape my profile data
+def get_my_profile_data(player_id, home_page):
+    general_info, names = get_general_info(player_id, home_page)
+    actions, ct_side_peaks, t_side_peaks = get_player_actions(player_id, home_page)
+    weapons = get_weapons_stats(player_id, home_page)
+    frags = get_frags_stats(player_id, home_page)
+    sessions = get_my_sessions(player_id, home_page)
+    events = get_my_games_events(player_id, home_page)
+
+    # Append team side peaks to general player info
+    general_info["CT_side_peaks"] = ct_side_peaks
+    general_info["T_side_peaks"] = t_side_peaks
+
+    return general_info, names, actions, weapons, frags, sessions, events

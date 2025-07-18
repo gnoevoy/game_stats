@@ -25,7 +25,7 @@ def get_links(content, home_page):
 
 
 def get_players_links():
-    logger.info("01. SCRAPING TOP 100 PLAYERS ...")
+    logger.info("---------- GET TOP 100 PLAYERS LINKS ----------")
 
     # Initialize list to store links and set up base URL
     players = []

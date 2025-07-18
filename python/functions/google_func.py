@@ -3,22 +3,26 @@ import json
 import os
 
 
-# Settings for bucket and BigQuery
+# Bucket settings
 bucket_name = os.getenv("BUCKET_NAME")
 storage_client = storage.Client()
 bucket = storage_client.bucket(bucket_name)
 
-bigquery_project = os.getenv("BIGQUERY_PROJECT")
-bigquery_dataset = os.getenv("BIGQUERY_DATASET")
+# BigQuery settings
+bigquery_project_id = os.getenv("BIGQUERY_PROJECT_ID")
+bigquery_dataset = os.getenv("DATASET_NAME")
 bigquery_client = bigquery.Client()
+
+
+# Read and write functions for Google Cloud Services
 
 
 def write_to_bucket(blob_name, data, file_type="json"):
     blob = bucket.blob(blob_name)
 
-    # Different logic for CSV and JSON
+    # Handle csv and json formats
     if file_type == "csv":
-        blob.upload_from_string(data.to_csv(index=False), content_type="text/csv")
+        blob.upload_from_string(data.to_csv(index=False, encoding="utf-8"), content_type="text/csv")
     else:
         content = json.dumps(data, indent=4, ensure_ascii=False)
         blob.upload_from_string(content, content_type="application/json")
@@ -32,7 +36,7 @@ def read_from_bucket(blob_name):
 
 def write_to_bigquery(bucket_path, table_name):
     gcs_uri = f"gs://{bucket_name}/{bucket_path}"
-    table_id = f"{bigquery_project}.{bigquery_dataset}.{table_name}"
+    table_id = f"{bigquery_project_id}.{bigquery_dataset}.{table_name}"
 
     job_config = bigquery.LoadJobConfig(
         source_format=bigquery.SourceFormat.CSV,
