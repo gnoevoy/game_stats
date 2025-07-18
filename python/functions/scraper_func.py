@@ -1,6 +1,7 @@
 from bs4 import BeautifulSoup
 import requests
 
+
 # There are 4 helper functions for all players and 3 for my profile
 # All functions have almost the same logic: make request -> render HTML content -> find elements ->  scrape data -> save it as a variable
 

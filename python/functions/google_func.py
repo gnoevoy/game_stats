@@ -1,4 +1,5 @@
 from google.cloud import bigquery, storage
+import pandas as pd
 import json
 import os
 
@@ -28,10 +29,16 @@ def write_to_bucket(blob_name, data, file_type="json"):
         blob.upload_from_string(content, content_type="application/json")
 
 
-def read_from_bucket(blob_name):
+def read_from_bucket(blob_name, file_type="json"):
     blob = bucket.blob(blob_name)
-    content = json.loads(blob.download_as_string())
-    return content
+
+    # Handle csv and json formats
+    if file_type == "csv":
+        df = pd.read_csv(f"gs://{bucket_name}/{blob_name}")
+        return df
+    else:
+        content = json.loads(blob.download_as_string())
+        return content
 
 
 def write_to_bigquery(bucket_path, table_name):
