@@ -1,4 +1,4 @@
--- Table that shows player achievements / actions for the last 30 days 
+-- Show player actions (for the last 30 days)
 
 with cte as (
     select

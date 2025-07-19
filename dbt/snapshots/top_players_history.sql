@@ -1,9 +1,6 @@
--- Table to track history of top players in the server
--- Join timestamp table to understand when the data was valid
+-- Table to track history of top players in the server by rank
 
 {% snapshot top_players_history %}
-
--- Use check strategy to append new records only when rank changes
 
 {{
    config(
@@ -14,8 +11,8 @@
    )
 }}
 
-select *
+select * 
 from {{ ref('players') }}
-cross join {{ ref('timestamp') }}
+cross join (select valid_at_poland_time from {{ ref('timestamp') }})
 
 {% endsnapshot %}

@@ -1,15 +1,8 @@
 version: 2
 
-# Simple tests to check relationships between calculated tables
+# Simple tests to check relationships between tables
 
 models:
-  - name: players
-    columns:
-      - name: player_id
-        tests:
-          - unique
-          - not_null
-
   - name: player_actions
     columns:
       - name: player_id
@@ -23,7 +16,7 @@ models:
               to: ref('actions')
               field: action_id
 
-  - name: player_frags
+  - name: frags
     columns:
       - name: player_id
         tests:
@@ -44,7 +37,7 @@ models:
               to: ref('weapons')
               field: weapon_id
   
-  - name: player_names
+  - name: names
     columns:
       - name: player_id
         tests:
@@ -52,7 +45,7 @@ models:
               to: ref('players')
               field: player_id
 
-  - name: my_events
+  - name: events
     columns:
       - name: event_type_id
         tests:
