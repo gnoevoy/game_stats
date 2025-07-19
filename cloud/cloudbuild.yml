@@ -2,16 +2,16 @@ steps:
 
   # Python
 
-  - id: "build python image from git repo"
+  - id: "Build python image from git repo"
     name: gcr.io/cloud-builders/docker
     args: ["build", "-t", "$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/python-script:$COMMIT_SHA", "."]
     dir: "python/"
 
-  - id: "push python image to cloud registry" 
+  - id: "Push python image to registry" 
     name: gcr.io/cloud-builders/docker
     args: ["push", "$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/python-script:$COMMIT_SHA"]
 
-  - id: "deploy python container to cloud run"
+  - id: "Deploy python container to cloud jobs"
     name: gcr.io/google.com/cloudsdktool/cloud-sdk
     entrypoint: gcloud
     args:
@@ -28,18 +28,16 @@ steps:
 
   # DBT
 
-  - id: "build dbt image from git repo"
+  - id: "Build dbt image from git repo"
     name: gcr.io/cloud-builders/docker
     args: ["build", "-t", "$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/dbt-script:$COMMIT_SHA", "."]
     dir: "dbt/"
-  
 
-  - id: "push dbt image to cloud registry" 
+  - id: "Push dbt image to registry" 
     name: gcr.io/cloud-builders/docker
     args: ["push", "$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/dbt-script:$COMMIT_SHA"]
 
-
-  - id: "deploy dbt container to cloud run"
+  - id: "Deploy dbt container to cloud jobs"
     name: gcr.io/google.com/cloudsdktool/cloud-sdk
     entrypoint: gcloud
     args:
@@ -54,9 +52,9 @@ steps:
       - $_DEPLOY_REGION
 
 
-  # Deploy the workflow 
+  # Workflow
 
-  - id: "deploy workflow with the latest images"
+  - id: "Update workflow yaml file from git repo"
     name: 'gcr.io/cloud-builders/gcloud'
     args: ['workflows', 'deploy', '$_WORKFLOW_NAME', '--source', 'cloud/workflow.yml', "--location", "$_DEPLOY_REGION"]   
 
