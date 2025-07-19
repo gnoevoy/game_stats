@@ -3,3 +3,4 @@ logs/
 .user.yml
 .dockerignore
 Dockerfile
+.env

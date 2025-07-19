@@ -1,12 +1,22 @@
 game_stats:
   outputs:
-    dev:
-      dataset: game_stats
-      job_retries: 1
-      location: EU
+    # Environment for runnning script locally and in Google Cloud
+    prod:
       method: oauth
+      dataset: game_stats
       priority: interactive
       project: "{{ env_var('GOOGLE_PROJECT_ID') }}"
       threads: 60
       type: bigquery
-  target: dev
+
+    # Environment for running script in Docker container
+    dev:
+      method: service-account
+      dataset: game_stats
+      priority: interactive
+      project: "{{ env_var('GOOGLE_PROJECT_ID') }}"
+      keyfile: /root/gcloud_key.json
+      threads: 60
+      type: bigquery
+
+  target: prod

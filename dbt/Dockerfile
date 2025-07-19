@@ -6,4 +6,4 @@ RUN pip install --no-cache-dir dbt-core dbt-bigquery
 
 COPY . .
 
-CMD [ "dbt", "build"]
+CMD ["dbt", "build", "--target", "prod"]

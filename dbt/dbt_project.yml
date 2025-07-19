@@ -14,6 +14,7 @@ clean-targets:
 
 models:
   game_stats:
+    # Create a table for for each model
     +materialized: table
     +schema: analytics
 

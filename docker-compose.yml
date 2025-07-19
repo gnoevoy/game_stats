@@ -1,6 +1,7 @@
 services:
+  # Test containers for Python and DBT scripts before deployment
 
-  # Test python script in Docker container
+  # Python
   python_script:
     image: python_script
     build:
@@ -14,3 +15,20 @@ services:
       - ./gcloud_key.json:/script/gcloud_key.json
     environment:
       - GOOGLE_APPLICATION_CREDENTIALS=/script/gcloud_key.json
+
+  # DBT
+  dbt_script:
+    image: dbt_script
+    build:
+      context: ./dbt
+      dockerfile: Dockerfile
+    # Load env variables and secrets on runtime
+    env_file:
+      - ./dbt/.env
+    volumes:
+      - ./gcloud_key.json:/root/gcloud_key.json
+    environment:
+      - GOOGLE_APPLICATION_CREDENTIALS=/root/gcloud_key.json
+
+    # Override the default command in the Dockerfile
+    command: [ "dbt", "build", "--target", "dev" ]
