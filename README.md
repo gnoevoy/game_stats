@@ -15,7 +15,7 @@
 ![Pipeline Logic](images/pipeline.jpg)
 
 ### Python Features
-- Applied `requests` + `BeautifulSoup4` for scraping player stats from the leaderboard  
+- Applied `requests` + `BeautifulSoup4` for scraping player stats 
 - Used `pandas` to clean and transform raw data into structured format  
 - Set up structured logging using Python's built-in `logging` module  
 - Added `try-except` blocks for basic error handling  
