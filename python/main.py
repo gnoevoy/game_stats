@@ -28,6 +28,7 @@ def main():
         raise
     except:
         logger.error("", exc_info=True)
+        raise
 
 
 if __name__ == "__main__":
