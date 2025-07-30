@@ -16,8 +16,8 @@ def transform_players_data(df):
     df["rank"] = df["rank"].str.split("\n").str[-1].astype(int)
     df["experience"] = df["experience"].str.split("\n").str[-1].str.replace(",", "").astype(int)
     df["frags_per_minute"] = df["frags_per_minute"].str.split("\t").str[-1].astype(float)
-    df["CT_side_peaks"] = df["CT_side_peaks"].fillna("").str.split("\n").str[2].replace("", None).astype(int)
-    df["T_side_peaks"] = df["T_side_peaks"].fillna("").str.split("\n").str[2].replace("", None).astype(int)
+    df["CT_side_peaks"] = df["CT_side_peaks"].fillna("").str.split("\n").str[2].replace("", None).astype("Int64")
+    df["T_side_peaks"] = df["T_side_peaks"].fillna("").str.split("\n").str[2].replace("", None).astype("Int64")
 
     # Helper function to apply for several columns
     def get_all_time_and_last_30_days_stats(col, col1_name, col2_name):
