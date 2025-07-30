@@ -1,12 +1,12 @@
 # Project Overview
 
-**Objective:** Build a data pipeline that scrapes stats from a website and delivers a clean, analytics-ready dataset. The scripts are automated and scheduled to run in the cloud.
+**Objective:** Build a data pipeline that scrapes stats from a website and delivers a clean, analytics-ready dataset. The script is automated and scheduled to run in the Google Cloud.
 
 **Data Source:** Player stats and rankings from a Counter-Strike: Source server leaderboard.
 
 **Used Tools:** `Python`, `SQL`, `dbt`, `Git`, `Docker`, `Google Cloud Storage`, `BigQuery`, `Google Cloud`
 
-**Result:** A snowflake-style dataset in BigQuery, organized into fact and dimension tables.
+**Result:** Regularly updated snowflake-style dataset in BigQuery, organized into fact and dimension tables.
 
 ![Dataset schema](images/schema.jpg)
 
@@ -30,7 +30,7 @@
 - Built `incremental models` to efficiently update only new or changed records  
 - Defined reusable `macros` to keep SQL logic modular and reusable 
 - Loaded static reference data using `seeds`  
-- Implemented `snapshots` to track historical changes in key tables  
+- Implemented `snapshots` to track historical changes in a table  
 - Added basic `tests` to ensure data quality and catch issues early  
 
 
@@ -43,9 +43,9 @@
 
 | Service / Tool       | Use Case                                                                 |
 |----------------------|----------------------------------------------------------------------------------------|
-| **GitHub**           | Stores pipeline code and deployment configs (YAML files) |
+| **GitHub**           | Stores pipeline code and deployment configs (YAML files). |
 | **Docker**           | Packages code into containers. Ensures consistency across environments. |
-| **Cloud Build**      | CI/CD tool that builds and deploys containers automatically. Also updates workflow yaml file             |
+| **Cloud Build**      | CI/CD tool that builds and deploys containers automatically. Also updates workflow yaml file.             |
 | **Artifact Registry**| Secure repository where Docker images are stored before deployment.                   |
 | **Cloud Run**        | Runs containers serverlessly with environment variables and volume support.        |
 | **Workflows**        | Orchestrates the flow of containers to ensure tasks run in proper sequence.           |
