@@ -1,8 +1,11 @@
 from google.cloud import bigquery, storage
 import pandas as pd
+import logging
 import json
 import os
 
+
+logger = logging.getLogger(__name__)
 
 # Bucket settings
 bucket_name = os.getenv("BUCKET_NAME")
@@ -10,12 +13,12 @@ storage_client = storage.Client()
 bucket = storage_client.bucket(bucket_name)
 
 # BigQuery settings
-bigquery_project_id = os.getenv("BIGQUERY_PROJECT_ID")
+bigquery_project_id = os.getenv("GOOGLE_CLOUD_PROJECT_ID")
 bigquery_dataset = os.getenv("DATASET_NAME")
 bigquery_client = bigquery.Client()
 
 
-# Read and write functions for Google Cloud Services
+# Helper functions for Google Cloud Services
 
 
 def write_to_bucket(blob_name, data, file_type="json"):
@@ -28,11 +31,12 @@ def write_to_bucket(blob_name, data, file_type="json"):
         content = json.dumps(data, indent=4, ensure_ascii=False)
         blob.upload_from_string(content, content_type="application/json")
 
+    logger.info(f"Data written to bucket as {blob_name}")
+
 
 def read_from_bucket(blob_name, file_type="json"):
     blob = bucket.blob(blob_name)
 
-    # Handle csv and json formats
     if file_type == "csv":
         df = pd.read_csv(f"gs://{bucket_name}/{blob_name}")
         return df
