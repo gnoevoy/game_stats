@@ -61,3 +61,4 @@ def write_to_bigquery(bucket_path, table_name):
 
     load_job = bigquery_client.load_table_from_uri(gcs_uri, table_id, job_config=job_config)
     load_job.result()
+    logger.info(f"Table {table_name} loaded to BigQuery")

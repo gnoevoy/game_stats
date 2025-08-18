@@ -2,16 +2,22 @@ from bs4 import BeautifulSoup
 import requests
 
 
-# There are 4 helper functions for all players and 3 for my profile
+# There are 4 helper functions to transform players data + 3 for my profile
 # All functions have almost the same logic: make request -> render HTML content -> find elements ->  scrape data -> save it as a variable
+
+
+# Helper function to get parsed HTML content
+def get_parsed_html(url):
+    response = requests.get(url)
+    content = response.content
+    soup = BeautifulSoup(content, "html.parser")
+    return soup
 
 
 def get_general_info(player_id, home_page):
     # Make request and parse the HTML content
     url = f"{home_page}hlstats.php?mode=playerinfo&type=ajax&game=css&tab=general_aliases&player={player_id}"
-    response = requests.get(url)
-    content = response.content
-    soup = BeautifulSoup(content, "html.parser")
+    soup = get_parsed_html(url)
 
     # Extract tables with content
     tables = soup.find_all("table", class_="data-table")
@@ -44,9 +50,7 @@ def get_general_info(player_id, home_page):
 def get_player_actions(player_id, home_page):
     sort_order = "&obj_sort=obj_count&obj_sortorder=desc&teams_sort=name&teams_sortorder=asc"
     url = f"{home_page}hlstats.php?mode=playerinfo&type=ajax&game=css&tab=playeractions_teams&player={player_id}{sort_order}"
-    response = requests.get(url)
-    content = response.content
-    soup = BeautifulSoup(content, "html.parser")
+    soup = get_parsed_html(url)
     tables = soup.find_all("table", class_="data-table")
 
     # Player actions for the last 30 days
@@ -85,9 +89,7 @@ def get_player_actions(player_id, home_page):
 
 def get_weapons_stats(player_id, home_page):
     url = f"{home_page}hlstats.php?mode=playerinfo&type=ajax&game=css&tab=weapons&player={player_id}&weap_sort=kills"
-    response = requests.get(url)
-    content = response.content
-    soup = BeautifulSoup(content, "html.parser")
+    soup = get_parsed_html(url)
     table = soup.find("table", class_="data-table")
 
     weapons = []
@@ -142,9 +144,7 @@ def get_frags_stats(player_id, home_page):
 # Get my profile sessions
 def get_my_sessions(player_id, home_page):
     url = f"{home_page}hlstats.php?mode=playersessions&player={player_id}"
-    response = requests.get(url)
-    content = response.content
-    soup = BeautifulSoup(content, "html.parser")
+    soup = get_parsed_html(url)
     table = soup.find("table", class_="data-table")
 
     sessions = []

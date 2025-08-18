@@ -1,11 +1,15 @@
-from datetime import datetime
 import pandas as pd
+import numpy as np
+import logging
 import pytz
 
 
-# Helper functions to clean / transform players data
+logger = logging.getLogger(__name__)
+pd.options.mode.chained_assignment = None
+server_timezone = pytz.timezone("Europe/Moscow")
 
-pd.options.mode.chained_assignment = None  # Hide pandas warnings
+
+# Helper function to clean and transform csv files from the bucket
 
 
 def transform_players_data(df):
@@ -35,6 +39,7 @@ def transform_players_data(df):
     get_all_time_and_last_30_days_stats("headshots", "headshots", "last_30_days_headshots")
 
     df.drop(columns=["frags"], inplace=True)
+    logger.info("Players data transformed successfully")
     return df
 
 
@@ -42,12 +47,12 @@ def transform_player_names(df):
     values = df["value"].str.split("\n")
     df["name"] = values.str[1].str.strip()
 
-    # Convert to Moscow time since server located in this region
+    # Timezone aware datetime
     df["last_used"] = pd.to_datetime(values.str[3].str.strip())
-    moscow_tz = pytz.timezone("Europe/Moscow")
-    df["last_used"] = df["last_used"].dt.tz_localize(moscow_tz)
+    df["last_used"] = df["last_used"].dt.tz_localize(server_timezone)
 
     df.drop(columns=["value"], inplace=True)
+    logger.info("Player names data transformed successfully")
     return df
 
 
@@ -77,6 +82,7 @@ def transform_player_actions(df):
     df["action_name"] = df["action_name"].map(translation_map).fillna(df["action_name"])
 
     df.drop(columns=["action"], inplace=True)
+    logger.info("Player actions data transformed successfully")
     return df
 
 
@@ -85,6 +91,7 @@ def transform_player_weapons(df):
     df["frags"] = values.str[3].str.replace(",", "").astype(int)
     df["headshots"] = values.str[6].str.replace(",", "").astype(int)
     df.drop(columns=["value"], inplace=True)
+    logger.info("Player weapons data transformed successfully")
     return df
 
 
@@ -94,6 +101,7 @@ def transform_player_frags(df):
     df["deaths"] = values.str[5].str.replace(",", "").astype(int)
     df["headshots"] = values.str[9].str.replace(",", "").astype(int)
     df.drop(columns=["value"], inplace=True)
+    logger.info("Player frags data transformed successfully")
     return df
 
 
@@ -113,32 +121,26 @@ def transform_sessions(df):
     df["time_played_in_minutes"] = round(pd.to_timedelta(time_played).dt.seconds / 60, 0).astype(int)
 
     df.drop(columns=["value"], inplace=True)
+    logger.info("Sessions data transformed successfully")
     return df
 
 
 def transform_events(df):
     values = df["value"].str.split("\n")
 
-    # Convert to Moscow timezone
+    # Timezone aware datetime
     df["timestamp"] = pd.to_datetime(values.str[0].str.strip())
-    moscow_tz = pytz.timezone("Europe/Moscow")
-    df["timestamp"] = df["timestamp"].dt.tz_localize(moscow_tz)
+    df["timestamp"] = df["timestamp"].dt.tz_localize(server_timezone)
 
     df["event"] = values.str[1].str.strip()
     df["description"] = values.str[2].str.strip().str.replace(".", "")
 
-    # Add index column to allow create an event id (timestamp + index combination) -> help to keep corect order of events
+    # Column that helps to keep correct order of events if there're multiple events occurred at the same time
+    # Highest index means the latest event
     df["event_index"] = range(len(df), 0, -1)
 
     # Filter out unwanted events
     df = df[~df["event"].isin(["Team Bonus", "Action"])]
     df.drop(columns=["value"], inplace=True)
-    return df
-
-
-# Create a timestamp table to know at what time the data is valid
-def create_timestamp_table():
-    warsaw_tz = pytz.timezone("Europe/Warsaw")
-    warsaw_time = datetime.now(warsaw_tz)
-    df = pd.DataFrame({"valid_at": [warsaw_time]})
+    logger.info("Events data transformed successfully")
     return df
