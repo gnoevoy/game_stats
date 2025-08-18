@@ -1,34 +1,40 @@
-services:
-  # Test containers for Python and DBT scripts before deployment
+# Load env variables and secrets on runtime
+x-secrets: &secrets
+  env_file:
+    - ./python/.env
+  volumes:
+    - ./gcloud_key.json:/script/gcloud_key.json
+  environment:
+    - GOOGLE_APPLICATION_CREDENTIALS=/script/gcloud_key.json
 
-  # Python
-  python_script:
-    image: python_script
+# Test scripts in an isolated environment before deploying
+services:
+  web_scraping:
+    image: web_scraping
     build:
       context: ./python
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.scraping
+    <<: *secrets
 
-    # Load env variables and secrets on runtime
-    env_file:
-      - ./python/.env
-    volumes:
-      - ./gcloud_key.json:/script/gcloud_key.json
-    environment:
-      - GOOGLE_APPLICATION_CREDENTIALS=/script/gcloud_key.json
-
-  # DBT
-  dbt_script:
-    image: dbt_script
+  data_transformation:
+    image: data_transformation
     build:
-      context: ./dbt
-      dockerfile: Dockerfile
-    # Load env variables and secrets on runtime
-    env_file:
-      - ./dbt/.env
-    volumes:
-      - ./gcloud_key.json:/root/gcloud_key.json
-    environment:
-      - GOOGLE_APPLICATION_CREDENTIALS=/root/gcloud_key.json
+      context: ./python
+      dockerfile: Dockerfile.pandas
+    <<: *secrets
+  # # DBT
+  # dbt_script:
+  #   image: dbt_script
+  #   build:
+  #     context: ./dbt
+  #     dockerfile: Dockerfile
+  #   # Load env variables and secrets on runtime
+  #   env_file:
+  #     - ./dbt/.env
+  #   volumes:
+  #     - ./gcloud_key.json:/root/gcloud_key.json
+  #   environment:
+  #     - GOOGLE_APPLICATION_CREDENTIALS=/root/gcloud_key.json
 
-    # Override the default command in the Dockerfile
-    command: [ "dbt", "build", "--target", "dev" ]
+  #   # Override the default command in the Dockerfile
+  #   command: [ "dbt", "build", "--target", "dev" ]
