@@ -1,4 +1,4 @@
-from functions.google_func import write_to_bucket
+from gcp_utils import write_to_bucket
 from bs4 import BeautifulSoup
 import requests
 import logging

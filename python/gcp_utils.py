@@ -39,9 +39,11 @@ def read_from_bucket(blob_name, file_type="json"):
 
     if file_type == "csv":
         df = pd.read_csv(f"gs://{bucket_name}/{blob_name}")
+        logger.info(f"File {blob_name} extracted from bucket")
         return df
     else:
         content = json.loads(blob.download_as_string())
+        logger.info(f"File {blob_name} extracted from bucket")
         return content
 
 

@@ -190,7 +190,7 @@ def get_my_games_events(player_id, home_page):
     return lst
 
 
-# Combine all helper functions to scrape my profile data
+# Combine all helper functions to scrape my profile stats
 def get_my_profile_data(player_id, home_page):
     general_info, names = get_general_info(player_id, home_page)
     actions, ct_side_peaks, t_side_peaks = get_player_actions(player_id, home_page)
