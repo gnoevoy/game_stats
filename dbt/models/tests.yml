@@ -1,0 +1,61 @@
+version: 2
+
+# Tests to check relationships between tables
+
+models:
+  - name: player_actions
+    columns:
+      - name: player_id
+        tests:
+          - relationships:
+              arguments:
+                to: ref('players')
+                field: player_id
+      - name: action_id
+        tests:
+          - relationships:
+              arguments:
+                to: ref('actions')
+                field: action_id
+
+  - name: frags
+    columns:
+      - name: player_id
+        tests:
+          - relationships:
+              arguments:
+                to: ref('players')
+                field: player_id
+
+  - name: player_weapons
+    columns:
+      - name: player_id
+        tests:
+          - relationships:
+              arguments:
+                to: ref('players')
+                field: player_id
+      - name: weapon_id
+        tests:
+          - relationships:
+              arguments:
+                to: ref('weapons')
+                field: weapon_id
+
+  - name: names
+    columns:
+      - name: player_id
+        tests:
+          - relationships:
+              arguments:
+                to: ref('players')
+                field: player_id
+
+  - name: events
+    columns:
+      - name: event_type_id
+        tests:
+          - relationships:
+              arguments:
+                to: ref('event_types')
+                field: event_type_id

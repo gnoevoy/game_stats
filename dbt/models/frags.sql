@@ -1,4 +1,4 @@
--- Display player frags (for the last 30 days)
+-- Player frags for the last 30 days
 
 select * 
 from {{ source('game_stats', 'frags') }}

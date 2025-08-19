@@ -1,6 +1,4 @@
--- Reusable functions for models 
-
--- Extract Poland time from UTC timestamp
+-- Reusable function to convert UTC to Poland timezone
 {% macro poland_time(timestamp) %}
     DATETIME(TIMESTAMP({{ timestamp }}), "Europe/Warsaw")
 {% endmacro %}

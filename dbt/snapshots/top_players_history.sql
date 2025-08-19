@@ -1,4 +1,7 @@
--- Table to track history of top players in the server by rank
+-- History of leaderboard players
+-- Used snapshot to track changes in player rankings over time
+
+{{ config(materialized='snapshot', unique_key='player_id') }}
 
 {% snapshot top_players_history %}
 
@@ -13,6 +16,5 @@
 
 select * 
 from {{ ref('players') }}
-cross join (select valid_at_poland_time from {{ ref('timestamp') }})
 
 {% endsnapshot %}

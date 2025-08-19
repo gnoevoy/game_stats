@@ -4,7 +4,7 @@ version: 2
 
 sources:
   - name: game_stats 
-    database: "{{ env_var('GOOGLE_PROJECT_ID') }}"
+    database: "{{ env_var('GOOGLE_CLOUD_PROJECT_ID') }}"
     schema: game_stats
     tables:
       - name: actions
@@ -14,4 +14,3 @@ sources:
       - name: sessions
       - name: weapons
       - name: names
-      - name: timestamp

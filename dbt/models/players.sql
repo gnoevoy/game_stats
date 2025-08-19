@@ -1,9 +1,21 @@
--- Main table that shows player statistics
--- Side peaks values are for the last 30 days
+-- Current leaderboard with players stats
 
-select *
+select
+    player_id,
+    player_name,
+    rank, 
+    experience, 
+    deaths,
+    kills,
+    headshots, 
+    frags_per_minute, 
+    last_30_days_kills, 
+    last_30_days_deaths,
+    last_30_days_headshots,
+    CT_side_peaks as ct_side_peaks_for_last_30_days,
+    T_side_peaks as t_side_peaks_for_last_30_days,
 from {{ source('game_stats', 'players') }} 
-order by player_id asc
+order by rank asc
 
 
 
