@@ -1,68 +1,101 @@
 steps:
-  # File that defines logic for deploying pipeline
 
-  # Python
-
-  - id: "Build python image from git repo"
+  - id: "Build web scraping image" 
     name: gcr.io/cloud-builders/docker
-    args: ["build", "-t", "$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/python-script:$COMMIT_SHA", "."]
+    args: ["build", "-f", "Dockerfile.scraping", "-t", "$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/web-scraping:$COMMIT_SHA", "."]
     dir: "python/"
 
-  - id: "Push python image to registry" 
+  # - id: "Push web scraping image" 
+  #   name: gcr.io/cloud-builders/docker
+  #   args: ["push", "$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/web-scraping:$COMMIT_SHA"]
+
+
+  - id: "Build data transformations image" 
     name: gcr.io/cloud-builders/docker
-    args: ["push", "$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/python-script:$COMMIT_SHA"]
+    args: ["build", "-f", "Dockerfile.pandas", "-t", "$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/data-transformations:$COMMIT_SHA", "."]
+    dir: "python/"
 
-  - id: "Deploy python container to cloud jobs"
-    name: gcr.io/google.com/cloudsdktool/cloud-sdk
-    entrypoint: gcloud
-    args:
-      - beta
-      - run
-      - jobs
-      - deploy
-      - python-script
-      - '--image'
-      - '$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/python-script:$COMMIT_SHA'
-      - '--region'
-      - $_DEPLOY_REGION
+  # - id: "Push data transformations image" 
+  #   name: gcr.io/cloud-builders/docker
+  #   args: ["push", "$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/data-transformations:$COMMIT_SHA"]
 
 
-  # DBT
-
-  - id: "Build dbt image from git repo"
+  - id: "Build dbt image" 
     name: gcr.io/cloud-builders/docker
-    args: ["build", "-t", "$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/dbt-script:$COMMIT_SHA", "."]
+    args: ["build", "-t", "$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/dbt:$COMMIT_SHA", "."]
     dir: "dbt/"
 
-  - id: "Push dbt image to registry" 
-    name: gcr.io/cloud-builders/docker
-    args: ["push", "$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/dbt-script:$COMMIT_SHA"]
-
-  - id: "Deploy dbt container to cloud jobs"
-    name: gcr.io/google.com/cloudsdktool/cloud-sdk
-    entrypoint: gcloud
-    args:
-      - beta
-      - run
-      - jobs
-      - deploy
-      - dbt-script
-      - '--image'
-      - '$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/dbt-script:$COMMIT_SHA'
-      - '--region'
-      - $_DEPLOY_REGION
-
-
-  # Workflow
-
-  - id: "Update workflow yaml file from git repo"
-    name: 'gcr.io/cloud-builders/gcloud'
-    args: ['workflows', 'deploy', '$_WORKFLOW_NAME', '--source', 'cloud/workflow.yml', "--location", "$_DEPLOY_REGION"]   
-
-
-options:
-  logging: CLOUD_LOGGING_ONLY
+  # - id: "Push dbt image" 
+  #   name: gcr.io/cloud-builders/docker
+  #   args: ["push", "$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/dbt:$COMMIT_SHA"]
 
 images:
-  - '$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/python-script:$COMMIT_SHA'
-  - '$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/dbt-script:$COMMIT_SHA'
+  - '$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/web-scraping:$COMMIT_SHA'
+  - '$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/data-transformations:$COMMIT_SHA'
+  - '$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/dbt:$COMMIT_SHA'
+
+
+
+  # # File that defines logic for deploying pipeline
+
+  # # Python
+
+
+  # - id: "Push python image to registry" 
+  #   name: gcr.io/cloud-builders/docker
+  #   args: ["push", "$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/python-script:$COMMIT_SHA"]
+
+  # - id: "Deploy python container to cloud jobs"
+  #   name: gcr.io/google.com/cloudsdktool/cloud-sdk
+  #   entrypoint: gcloud
+  #   args:
+  #     - beta
+  #     - run
+  #     - jobs
+  #     - deploy
+  #     - python-script
+  #     - '--image'
+  #     - '$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/python-script:$COMMIT_SHA'
+  #     - '--region'
+  #     - $_DEPLOY_REGION
+
+
+  # # DBT
+
+  # - id: "Build dbt image from git repo"
+  #   name: gcr.io/cloud-builders/docker
+  #   args: ["build", "-t", "$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/dbt-script:$COMMIT_SHA", "."]
+  #   dir: "dbt/"
+
+  # - id: "Push dbt image to registry" 
+  #   name: gcr.io/cloud-builders/docker
+  #   args: ["push", "$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/dbt-script:$COMMIT_SHA"]
+
+  # - id: "Deploy dbt container to cloud jobs"
+  #   name: gcr.io/google.com/cloudsdktool/cloud-sdk
+  #   entrypoint: gcloud
+  #   args:
+  #     - beta
+  #     - run
+  #     - jobs
+  #     - deploy
+  #     - dbt-script
+  #     - '--image'
+  #     - '$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/dbt-script:$COMMIT_SHA'
+  #     - '--region'
+  #     - $_DEPLOY_REGION
+
+
+  # # Workflow
+
+  # - id: "Update workflow yaml file from git repo"
+  #   name: 'gcr.io/cloud-builders/gcloud'
+  #   args: ['workflows', 'deploy', '$_WORKFLOW_NAME', '--source', 'cloud/workflow.yml', "--location", "$_DEPLOY_REGION"]   
+
+
+# options:
+#   logging: CLOUD_LOGGING_ONLY
+
+# images:
+#   - '$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/python-script:$COMMIT_SHA'
+#   - '$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/dbt-script:$COMMIT_SHA'

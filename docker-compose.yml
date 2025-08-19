@@ -1,5 +1,5 @@
 # Load env variables and secrets on runtime for python scripts
-x-secrets-python: &secrets-python
+x-secrets: &secrets
   env_file:
     - ./python/.env
   volumes:
@@ -14,20 +14,23 @@ services:
     build:
       context: ./python
       dockerfile: Dockerfile.scraping
-    <<: *secrets-python
+    <<: *secrets
+    environment:
+      - name=value
 
   data_transformations:
     image: data_transformations
     build:
       context: ./python
       dockerfile: Dockerfile.pandas
-    <<: *secrets-python
+    <<: *secrets
 
   dbt:
     image: dbt
     build:
       context: ./dbt
       dockerfile: Dockerfile
+
     # Load env variables and secrets on runtime
     env_file:
       - ./dbt/.env
