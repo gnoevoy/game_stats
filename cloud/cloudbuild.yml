@@ -1,23 +1,25 @@
 steps:
 
-  - id: "Build web scraping image" 
+  # Building and pushing images to Artifact Registry
+
+  - id: "Build web-scraping image" 
     name: gcr.io/cloud-builders/docker
     args: ["build", "-f", "Dockerfile.scraping", "-t", "$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/web-scraping:$COMMIT_SHA", "."]
     dir: "python/"
 
-  # - id: "Push web scraping image" 
-  #   name: gcr.io/cloud-builders/docker
-  #   args: ["push", "$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/web-scraping:$COMMIT_SHA"]
+  - id: "Push web-scraping image" 
+    name: gcr.io/cloud-builders/docker
+    args: ["push", "$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/web-scraping:$COMMIT_SHA"]
 
 
-  - id: "Build data transformations image" 
+  - id: "Build data-transformations image" 
     name: gcr.io/cloud-builders/docker
     args: ["build", "-f", "Dockerfile.pandas", "-t", "$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/data-transformations:$COMMIT_SHA", "."]
     dir: "python/"
 
-  # - id: "Push data transformations image" 
-  #   name: gcr.io/cloud-builders/docker
-  #   args: ["push", "$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/data-transformations:$COMMIT_SHA"]
+  - id: "Push data-transformations image" 
+    name: gcr.io/cloud-builders/docker
+    args: ["push", "$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/data-transformations:$COMMIT_SHA"]
 
 
   - id: "Build dbt image" 
@@ -25,22 +27,51 @@ steps:
     args: ["build", "-t", "$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/dbt:$COMMIT_SHA", "."]
     dir: "dbt/"
 
-  # - id: "Push dbt image" 
-  #   name: gcr.io/cloud-builders/docker
-  #   args: ["push", "$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/dbt:$COMMIT_SHA"]
+  - id: "Push dbt image" 
+    name: gcr.io/cloud-builders/docker
+    args: ["push", "$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/dbt:$COMMIT_SHA"]
 
-images:
-  - '$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/web-scraping:$COMMIT_SHA'
-  - '$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/data-transformations:$COMMIT_SHA'
-  - '$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/dbt:$COMMIT_SHA'
+
+  # Deploying containers to Cloud Run Jobs
+
+  - id: "Deploy web scraping container"
+    name: gcr.io/google.com/cloudsdktool/cloud-sdk
+    entrypoint: gcloud
+    args: [
+      "run", "jobs", "deploy", "web-scraping",
+      "--image", "$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/web-scraping:$COMMIT_SHA",
+      "--region", "$_DEPLOY_REGION",
+      "--project", "$PROJECT_ID"
+    ]
+
+  - id: "Deploy data transformations container"
+    name: gcr.io/google.com/cloudsdktool/cloud-sdk
+    entrypoint: gcloud
+    args: [
+      "run", "jobs", "deploy", "data-transformations",
+      "--image", "$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/data-transformations:$COMMIT_SHA",
+      "--region", "$_DEPLOY_REGION",
+      "--project", "$PROJECT_ID"
+    ]
+
+  - id: "Deploy dbt container"
+    name: gcr.io/google.com/cloudsdktool/cloud-sdk
+    entrypoint: gcloud
+    args: [
+      "run", "jobs", "deploy", "web-scraping",
+      "--image", "$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/dbt:$COMMIT_SHA",
+      "--region", "$_DEPLOY_REGION",
+      "--project", "$PROJECT_ID"
+    ]
+
+# This step is automatically pushes created images
+# images:
+#   - '$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/web-scraping:$COMMIT_SHA'
+#   - '$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/data-transformations:$COMMIT_SHA'
+#   - '$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/dbt:$COMMIT_SHA'
 
 options:
   logging: CLOUD_LOGGING_ONLY
-
-
-  # # File that defines logic for deploying pipeline
-
-  # # Python
 
 
   # - id: "Push python image to registry" 
@@ -62,17 +93,6 @@ options:
   #     - $_DEPLOY_REGION
 
 
-  # # DBT
-
-  # - id: "Build dbt image from git repo"
-  #   name: gcr.io/cloud-builders/docker
-  #   args: ["build", "-t", "$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/dbt-script:$COMMIT_SHA", "."]
-  #   dir: "dbt/"
-
-  # - id: "Push dbt image to registry" 
-  #   name: gcr.io/cloud-builders/docker
-  #   args: ["push", "$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/dbt-script:$COMMIT_SHA"]
-
   # - id: "Deploy dbt container to cloud jobs"
   #   name: gcr.io/google.com/cloudsdktool/cloud-sdk
   #   entrypoint: gcloud
@@ -93,9 +113,3 @@ options:
   # - id: "Update workflow yaml file from git repo"
   #   name: 'gcr.io/cloud-builders/gcloud'
   #   args: ['workflows', 'deploy', '$_WORKFLOW_NAME', '--source', 'cloud/workflow.yml', "--location", "$_DEPLOY_REGION"]   
-
-
-
-# images:
-#   - '$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/python-script:$COMMIT_SHA'
-#   - '$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/dbt-script:$COMMIT_SHA'
