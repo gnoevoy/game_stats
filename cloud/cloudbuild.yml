@@ -34,6 +34,8 @@ images:
   - '$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/data-transformations:$COMMIT_SHA'
   - '$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/dbt:$COMMIT_SHA'
 
+options:
+  logging: CLOUD_LOGGING_ONLY
 
 
   # # File that defines logic for deploying pipeline
@@ -93,8 +95,6 @@ images:
   #   args: ['workflows', 'deploy', '$_WORKFLOW_NAME', '--source', 'cloud/workflow.yml', "--location", "$_DEPLOY_REGION"]   
 
 
-# options:
-#   logging: CLOUD_LOGGING_ONLY
 
 # images:
 #   - '$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/python-script:$COMMIT_SHA'
