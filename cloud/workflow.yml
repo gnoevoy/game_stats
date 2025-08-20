@@ -1,21 +1,36 @@
 main:
   steps:
-
-    # Create env variables
+    # Set env variables
     - init:
         assign:
           - project_id: ${sys.get_env("GOOGLE_CLOUD_PROJECT_ID")}
           - region: europe-central2
 
-    # Sequentially run Python and DBT scripts as Cloud Run jobs
-    - python_script:
-        call: googleapis.run.v1.namespaces.jobs.run
-        args:
-          name: ${"namespaces/" + project_id + "/jobs/" + "python-script"}
-          location: ${region}
+    # Run sequentially jobs
 
-    - dbt_script:
+    - web_scraping:
         call: googleapis.run.v1.namespaces.jobs.run
         args:
-          name: ${"namespaces/" + project_id + "/jobs/" + "dbt-script"}
+          name: ${"namespaces/" + project_id + "/jobs/" + "web-scraping"}
           location: ${region}
+        result: web_scraping_result
+        next: data_transformations
+
+    - data_transformations:
+        call: googleapis.run.v1.namespaces.jobs.run
+        args:
+          name: ${"namespaces/" + project_id + "/jobs/" + "data-transformations"}
+          location: ${region}
+        result: data_transformations_result
+        next: dbt
+    
+    - dbt:
+        call: googleapis.run.v1.namespaces.jobs.run
+        args:
+          name: ${"namespaces/" + project_id + "/jobs/" + "dbt"}
+          location: ${region}     
+        result: dbt_result
+        next: finish
+
+    - finish:
+        return: ${dbt_result}
