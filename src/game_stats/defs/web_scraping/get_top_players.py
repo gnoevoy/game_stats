@@ -1,4 +1,5 @@
 from game_stats.defs.web_scraping.gcs_utils import write_to_bucket
+from dagster_gcp.gcs import GCSResource
 from bs4 import BeautifulSoup
 import dagster as dg
 import requests
@@ -21,7 +22,7 @@ def get_links(content, home_page):
 
 
 @dg.asset
-def get_players_links(context, gcs):
+def get_players_links(context: dg.AssetExecutionContext, gcs: GCSResource):
     context.log.info("GET TOP 100 PLAYERS LINKS")
 
     # Set up base URL
@@ -45,4 +46,4 @@ def get_players_links(context, gcs):
         page_num += 1
 
     context.log.info(f"Scraped {len(players)} / 100 links")
-    write_to_bucket(gcs, "top_100_players.json", players)
+    write_to_bucket(context, gcs, "top_100_players.json", players)

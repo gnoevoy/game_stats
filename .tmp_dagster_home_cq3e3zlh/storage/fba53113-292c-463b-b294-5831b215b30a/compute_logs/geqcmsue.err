@@ -1,0 +1,10 @@
+[32m2025-08-23 07:19:40 +0200[0m - dagster - [34mDEBUG[0m - __ASSET_JOB - fba53113-292c-463b-b294-5831b215b30a - 17401 - LOGS_CAPTURED - Started capturing logs in process (pid: 17401).
+[32m2025-08-23 07:19:41 +0200[0m - dagster - [34mDEBUG[0m - __ASSET_JOB - fba53113-292c-463b-b294-5831b215b30a - 17401 - get_players_links - STEP_START - Started execution of step "get_players_links".
+[32m2025-08-23 07:19:41 +0200[0m - dagster - [34mINFO[0m - __ASSET_JOB - fba53113-292c-463b-b294-5831b215b30a - get_players_links - GET TOP 100 PLAYERS LINKS
+[32m2025-08-23 07:19:43 +0200[0m - dagster - [34mINFO[0m - __ASSET_JOB - fba53113-292c-463b-b294-5831b215b30a - get_players_links - Scraped 100 / 100 links
+[32m2025-08-23 07:19:44 +0200[0m - dagster - [34mINFO[0m - __ASSET_JOB - fba53113-292c-463b-b294-5831b215b30a - get_players_links - Data written to bucket as top_100_players.json
+[32m2025-08-23 07:19:44 +0200[0m - dagster - [34mDEBUG[0m - __ASSET_JOB - fba53113-292c-463b-b294-5831b215b30a - 17401 - get_players_links - STEP_OUTPUT - Yielded output "result" of type "Any". (Type check passed).
+[32m2025-08-23 07:19:45 +0200[0m - dagster - [34mDEBUG[0m - __ASSET_JOB - fba53113-292c-463b-b294-5831b215b30a - get_players_links - Writing file at: /home/bars1k/git_repos/game_stats/.tmp_dagster_home_cq3e3zlh/storage/get_players_links using PickledObjectFilesystemIOManager...
+[32m2025-08-23 07:19:45 +0200[0m - dagster - [34mDEBUG[0m - __ASSET_JOB - fba53113-292c-463b-b294-5831b215b30a - 17401 - get_players_links - ASSET_MATERIALIZATION - Materialized value get_players_links.
+[32m2025-08-23 07:19:45 +0200[0m - dagster - [34mDEBUG[0m - __ASSET_JOB - fba53113-292c-463b-b294-5831b215b30a - 17401 - get_players_links - HANDLED_OUTPUT - Handled output "result" using IO manager "io_manager"
+[32m2025-08-23 07:19:45 +0200[0m - dagster - [34mDEBUG[0m - __ASSET_JOB - fba53113-292c-463b-b294-5831b215b30a - 17401 - get_players_links - STEP_SUCCESS - Finished execution of step "get_players_links" in 3.66s.
