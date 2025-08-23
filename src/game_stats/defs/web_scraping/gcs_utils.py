@@ -3,17 +3,17 @@ import json
 import os
 
 
-# Bucket settings
-BUCKET_NAME = os.getenv("BUCKET_NAME")
+# Env variables
+bucket_name = os.getenv("BUCKET_NAME")
+
+
+# Helper functions for Google Cloud Services
 
 
 def get_bucket_conn(gcs):
     gcs_client = gcs.get_client()
-    bucket = gcs_client.bucket(BUCKET_NAME)
+    bucket = gcs_client.bucket(bucket_name)
     return bucket
-
-
-# Helper functions for Google Cloud Services
 
 
 def write_to_bucket(context, gcs, blob_name, data, file_type="json"):
@@ -35,7 +35,7 @@ def read_from_bucket(context, gcs, blob_name, file_type="json"):
     blob = bucket.blob(blob_name)
 
     if file_type == "csv":
-        df = pd.read_csv(f"gs://{BUCKET_NAME}/{blob_name}")
+        df = pd.read_csv(f"gs://{bucket_name}/{blob_name}")
         context.log.info(f"File {blob_name} extracted from bucket")
         return df
     else:
