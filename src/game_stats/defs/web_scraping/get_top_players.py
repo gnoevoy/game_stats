@@ -21,7 +21,7 @@ def get_links(content, home_page):
     return lst
 
 
-@dg.asset
+@dg.asset(group_name="web_scraping")
 def get_players_links(context: dg.AssetExecutionContext, gcs: GCSResource):
     context.log.info("GET TOP 100 PLAYERS LINKS")
 

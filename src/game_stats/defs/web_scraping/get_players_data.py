@@ -1,13 +1,12 @@
 from game_stats.defs.web_scraping.scraping_utils import get_general_info, get_player_actions, get_weapons_stats, get_frags_stats, get_my_profile_data
 from game_stats.defs.web_scraping.gcs_utils import write_to_bucket, read_from_bucket
-from game_stats.defs.web_scraping.get_top_players import get_players_links
 from dagster_gcp.gcs import GCSResource
 import dagster as dg
 import pandas as pd
 import os
 
 
-@dg.asset(deps=[get_players_links])
+@dg.asset(deps=["get_players_links"], group_name="web_scraping")
 def get_players_stats(context: dg.AssetExecutionContext, gcs: GCSResource):
     context.log.info("GET PLAYERS STATS")
 

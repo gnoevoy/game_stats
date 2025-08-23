@@ -1,0 +1,16 @@
+version: 2
+
+# Import all tables for reference in models
+
+sources:
+  - name: game_stats 
+    database: "{{ env_var('GOOGLE_CLOUD_PROJECT_ID') }}"
+    schema: game_stats
+    tables:
+      - name: actions
+      - name: events
+      - name: frags
+      - name: players
+      - name: sessions
+      - name: weapons
+      - name: names
