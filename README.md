@@ -1,54 +1,61 @@
-# Project Overview
+# game_stats
 
-**Objective:** Build a data pipeline that scrapes stats from a website and delivers a clean, analytics-ready dataset. The script is automated and scheduled to run in the Google Cloud.
+## Getting started
 
-**Data Source:** Player stats and rankings from a Counter-Strike: Source server leaderboard.
+### Installing dependencies
 
-**Used Tools:** `Python`, `SQL`, `dbt`, `Git`, `Docker`, `Google Cloud Storage`, `BigQuery`, `Google Cloud`
+**Option 1: uv**
 
-**Result:** Regularly updated snowflake-style dataset in BigQuery, organized into fact and dimension tables.
+Ensure [`uv`](https://docs.astral.sh/uv/) is installed following their [official documentation](https://docs.astral.sh/uv/getting-started/installation/).
 
-![Dataset schema](images/schema.jpg)
+Create a virtual environment, and install the required dependencies using _sync_:
 
+```bash
+uv sync
+```
 
-<br>
+Then, activate the virtual environment:
 
+| OS | Command |
+| --- | --- |
+| MacOS | ```source .venv/bin/activate``` |
+| Windows | ```.venv\Scripts\activate``` |
 
-## Pipeline Logic
+**Option 2: pip**
 
-![Pipeline Logic](images/pipeline.jpg)
+Install the python dependencies with [pip](https://pypi.org/project/pip/):
 
-### Python:
-- Applied `requests` + `BeautifulSoup4` modules for scraping player stats 
-- Used `pandas` to clean and transform raw data into structured format  
-- Set up structured logging using Python's built-in `logging` module  
-- Implemented `try-except` logic for error handling throughout the code 
-- Scripts are modular and organized across files
+```bash
+python3 -m venv .venv
+```
 
-### DBT:
-- Configured multiple `profiles` to support both local development and cloud execution  
-- Built `incremental models` to efficiently update only new or changed records  
-- Defined reusable `macros` to keep SQL logic modular and reusable 
-- Loaded static reference data using `seeds`  
-- Implemented `snapshots` to track historical changes in a table  
-- Added basic `tests` to ensure data quality and catch issues early  
+Then active the virtual environment:
 
+| OS | Command |
+| --- | --- |
+| MacOS | ```source .venv/bin/activate``` |
+| Windows | ```.venv\Scripts\activate``` |
 
-<br>
+Install the required dependencies:
 
+```bash
+pip install -e ".[dev]"
+```
 
-## Cloud Automation & Orchestration
+### Running Dagster
 
-![Cloud](images/cloud.jpg)
+Start the Dagster UI web server:
 
-| Service / Tool       | Use Case                                                                 |
-|----------------------|----------------------------------------------------------------------------------------|
-| **GitHub**           | Stores pipeline code and deployment configs (YAML files). |
-| **Docker**           | Packages code into containers. Ensures consistency across environments. |
-| **Cloud Build**      | CI/CD tool that builds and deploys containers automatically. Also updates workflow yaml file.             |
-| **Artifact Registry**| Secure repository where Docker images are stored before deployment.                   |
-| **Cloud Run**        | Runs containers serverlessly with environment variables and volume support.        |
-| **Workflows**        | Orchestrates the flow of containers to ensure tasks run in proper sequence.           |
-| **Cloud Scheduler**  | Triggers workflows based on a schedule (like a CRON job). Enables automated runs.     |
+```bash
+dg dev
+```
 
-This architecture automates a data pipeline using Google Cloud services. Code is versioned in GitHub, containerized with Docker, and deployed via Cloud Build into a serverless environment (Cloud Run). Workflow and Scheduler ensure tasks are orchestrated and executed on a schedule.
+Open http://localhost:3000 in your browser to see the project.
+
+## Learn more
+
+To learn more about this template and Dagster in general:
+
+- [Dagster Documentation](https://docs.dagster.io/)
+- [Dagster University](https://courses.dagster.io/)
+- [Dagster Slack Community](https://dagster.io/slack)

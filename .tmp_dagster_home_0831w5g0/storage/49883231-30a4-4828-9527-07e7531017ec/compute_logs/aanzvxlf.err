@@ -1,0 +1,22 @@
+[32m2025-08-23 02:08:49 +0200[0m - dagster - [34mDEBUG[0m - __ASSET_JOB - 49883231-30a4-4828-9527-07e7531017ec - 89409 - LOGS_CAPTURED - Started capturing logs in process (pid: 89409).
+[32m2025-08-23 02:08:49 +0200[0m - dagster - [34mDEBUG[0m - __ASSET_JOB - 49883231-30a4-4828-9527-07e7531017ec - 89409 - get_players_links - STEP_START - Started execution of step "get_players_links".
+[32m2025-08-23 02:08:49 +0200[0m - dagster - [34mINFO[0m - __ASSET_JOB - 49883231-30a4-4828-9527-07e7531017ec - get_players_links - GET TOP 100 PLAYERS LINKS
+[32m2025-08-23 02:08:49 +0200[0m - dagster - [34mINFO[0m - __ASSET_JOB - 49883231-30a4-4828-9527-07e7531017ec - get_players_links - Home page: https://stats.bc18go.ru/
+[32m2025-08-23 02:08:49 +0200[0m - dagster - [34mERROR[0m - [31m__ASSET_JOB - 49883231-30a4-4828-9527-07e7531017ec - 89409 - get_players_links - STEP_FAILURE - Execution of step "get_players_links" failed.
+
+dagster._core.errors.DagsterExecutionStepExecutionError: Error occurred while executing op "get_players_links"::
+
+RuntimeError: No active exception to reraise
+
+Stack Trace:
+  File "/home/bars1k/git_repos/game_stats/.venv/lib/python3.10/site-packages/dagster/_core/execution/plan/utils.py", line 57, in op_execution_error_boundary
+    yield
+  File "/home/bars1k/git_repos/game_stats/.venv/lib/python3.10/site-packages/dagster/_utils/__init__.py", line 392, in iterate_with_context
+    next_output = next(iterator)
+  File "/home/bars1k/git_repos/game_stats/.venv/lib/python3.10/site-packages/dagster/_core/execution/plan/compute_generator.py", line 137, in _coerce_op_compute_fn_to_iterator
+    result = invoke_compute_fn(
+  File "/home/bars1k/git_repos/game_stats/.venv/lib/python3.10/site-packages/dagster/_core/execution/plan/compute_generator.py", line 117, in invoke_compute_fn
+    return fn(context, **args_to_pass) if context_arg_provided else fn(**args_to_pass)
+  File "/home/bars1k/git_repos/game_stats/src/game_stats/defs/web_scraping/get_top_players.py", line 15, in get_players_links
+    raise
+[0m
