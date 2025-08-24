@@ -1,9 +1,12 @@
-from game_stats.defs.web_scraping.gcs_utils import write_to_bucket
-from dagster_gcp.gcs import GCSResource
+from python.web_scraping.gcp_utils import write_to_bucket
 from bs4 import BeautifulSoup
-import dagster as dg
+from airflow.sdk import task
 import requests
+import logging
 import os
+
+
+logger = logging.getLogger(__name__)
 
 
 def get_links(content, home_page):
@@ -21,9 +24,9 @@ def get_links(content, home_page):
     return lst
 
 
-@dg.asset(group_name="web_scraping")
-def get_players_links(context: dg.AssetExecutionContext, gcs: GCSResource):
-    context.log.info("GET TOP 100 PLAYERS LINKS")
+@task()
+def get_players_links():
+    logger.info(">>> GET TOP 100 PLAYERS LINKS")
 
     # Set up base URL
     home_page = os.getenv("BASE_URL")
@@ -40,10 +43,10 @@ def get_players_links(context: dg.AssetExecutionContext, gcs: GCSResource):
             links = get_links(content, home_page)
             players.extend(links)
         else:
-            context.log.error(f"Failed to retrieve page {page_num}: {response.status_code}")
+            logger.error(f">>> Failed to retrieve page {page_num}: {response.status_code}")
             break
 
         page_num += 1
 
-    context.log.info(f"Scraped {len(players)} / 100 links")
-    write_to_bucket(context, gcs, "top_100_players.json", players)
+    logger.info(f">>> Scraped {len(players)} / 100 links")
+    write_to_bucket(players, "top_100_players.json")

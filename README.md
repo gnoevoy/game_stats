@@ -1,61 +1,45 @@
-# game_stats
+Overview
+========
 
-## Getting started
+Welcome to Astronomer! This project was generated after you ran 'astro dev init' using the Astronomer CLI. This readme describes the contents of the project, as well as how to run Apache Airflow on your local machine.
 
-### Installing dependencies
+Project Contents
+================
 
-**Option 1: uv**
+Your Astro project contains the following files and folders:
 
-Ensure [`uv`](https://docs.astral.sh/uv/) is installed following their [official documentation](https://docs.astral.sh/uv/getting-started/installation/).
+- dags: This folder contains the Python files for your Airflow DAGs. By default, this directory includes one example DAG:
+    - `example_astronauts`: This DAG shows a simple ETL pipeline example that queries the list of astronauts currently in space from the Open Notify API and prints a statement for each astronaut. The DAG uses the TaskFlow API to define tasks in Python, and dynamic task mapping to dynamically print a statement for each astronaut. For more on how this DAG works, see our [Getting started tutorial](https://www.astronomer.io/docs/learn/get-started-with-airflow).
+- Dockerfile: This file contains a versioned Astro Runtime Docker image that provides a differentiated Airflow experience. If you want to execute other commands or overrides at runtime, specify them here.
+- include: This folder contains any additional files that you want to include as part of your project. It is empty by default.
+- packages.txt: Install OS-level packages needed for your project by adding them to this file. It is empty by default.
+- requirements.txt: Install Python packages needed for your project by adding them to this file. It is empty by default.
+- plugins: Add custom or community plugins for your project to this file. It is empty by default.
+- airflow_settings.yaml: Use this local-only file to specify Airflow Connections, Variables, and Pools instead of entering them in the Airflow UI as you develop DAGs in this project.
 
-Create a virtual environment, and install the required dependencies using _sync_:
+Deploy Your Project Locally
+===========================
 
-```bash
-uv sync
-```
+Start Airflow on your local machine by running 'astro dev start'.
 
-Then, activate the virtual environment:
+This command will spin up five Docker containers on your machine, each for a different Airflow component:
 
-| OS | Command |
-| --- | --- |
-| MacOS | ```source .venv/bin/activate``` |
-| Windows | ```.venv\Scripts\activate``` |
+- Postgres: Airflow's Metadata Database
+- Scheduler: The Airflow component responsible for monitoring and triggering tasks
+- DAG Processor: The Airflow component responsible for parsing DAGs
+- API Server: The Airflow component responsible for serving the Airflow UI and API
+- Triggerer: The Airflow component responsible for triggering deferred tasks
 
-**Option 2: pip**
+When all five containers are ready the command will open the browser to the Airflow UI at http://localhost:8080/. You should also be able to access your Postgres Database at 'localhost:5432/postgres' with username 'postgres' and password 'postgres'.
 
-Install the python dependencies with [pip](https://pypi.org/project/pip/):
+Note: If you already have either of the above ports allocated, you can either [stop your existing Docker containers or change the port](https://www.astronomer.io/docs/astro/cli/troubleshoot-locally#ports-are-not-available-for-my-local-airflow-webserver).
 
-```bash
-python3 -m venv .venv
-```
+Deploy Your Project to Astronomer
+=================================
 
-Then active the virtual environment:
+If you have an Astronomer account, pushing code to a Deployment on Astronomer is simple. For deploying instructions, refer to Astronomer documentation: https://www.astronomer.io/docs/astro/deploy-code/
 
-| OS | Command |
-| --- | --- |
-| MacOS | ```source .venv/bin/activate``` |
-| Windows | ```.venv\Scripts\activate``` |
+Contact
+=======
 
-Install the required dependencies:
-
-```bash
-pip install -e ".[dev]"
-```
-
-### Running Dagster
-
-Start the Dagster UI web server:
-
-```bash
-dg dev
-```
-
-Open http://localhost:3000 in your browser to see the project.
-
-## Learn more
-
-To learn more about this template and Dagster in general:
-
-- [Dagster Documentation](https://docs.dagster.io/)
-- [Dagster University](https://courses.dagster.io/)
-- [Dagster Slack Community](https://dagster.io/slack)
+The Astronomer CLI is maintained with love by the Astronomer team. To report a bug or suggest a change, reach out to our support.

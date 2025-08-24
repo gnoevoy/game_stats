@@ -1,0 +1,7 @@
+apache-airflow-providers-google==10.13.1
+requests==2.32.4
+beautifulsoup4==4.13.4
+pendulum==3.1.0
+pandas==2.3.1
+numpy==2.2.6
+astronomer-cosmos==1.10.1

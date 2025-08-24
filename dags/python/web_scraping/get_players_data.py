@@ -1,17 +1,19 @@
-from game_stats.defs.web_scraping.scraping_utils import get_general_info, get_player_actions, get_weapons_stats, get_frags_stats, get_my_profile_data
-from game_stats.defs.web_scraping.gcs_utils import write_to_bucket, read_from_bucket
-from dagster_gcp.gcs import GCSResource
-import dagster as dg
+from scraping_utils import get_general_info, get_player_actions, get_weapons_stats, get_frags_stats, get_my_profile_data
+
+# from dags.python.web_scraping.gcp_utils import write_to_bucket, read_from_bucket
 import pandas as pd
+import logging
 import os
 
 
-@dg.asset(deps=["get_players_links"], group_name="web_scraping")
-def get_players_stats(context: dg.AssetExecutionContext, gcs: GCSResource):
-    context.log.info("GET PLAYERS STATS")
+logger = logging.getLogger(__name__)
+
+
+def get_players_stats():
+    logger.info("SCRAPING PLAYERS DATA")
 
     # Get players links from the bucket
-    links = read_from_bucket(context, gcs, "top_100_players.json")
+    links = read_from_bucket("top_100_players.json")
     home_page = os.getenv("BASE_URL")
     players, names, actions, weapons, frags = [], [], [], [], []
 
@@ -23,7 +25,7 @@ def get_players_stats(context: dg.AssetExecutionContext, gcs: GCSResource):
     actions.extend(my_actions)
     weapons.extend(my_weapons)
     frags.extend(my_frags)
-    context.log.info("Scraped my profile stats")
+    logger.info("Scraped my profile stats")
 
     # Iterate through the list and scrape players data
     for i, link in enumerate(links, start=1):
@@ -33,7 +35,7 @@ def get_players_stats(context: dg.AssetExecutionContext, gcs: GCSResource):
 
             # If my profile in top 100 -> skip it to avoid duplication
             if int(player_id) == my_id:
-                context.log.info(f"{i}/100, skipping my profile")
+                logger.info(f"{i}/100, skipping my profile")
                 continue
 
             player_info, player_names = get_general_info(player_id, home_page)
@@ -51,17 +53,17 @@ def get_players_stats(context: dg.AssetExecutionContext, gcs: GCSResource):
             actions.extend(player_actions)
             weapons.extend(player_weapons)
             frags.extend(player_frags)
-            context.log.info(f"{i}/100, player {player_id} scraped")
+            logger.info(f"{i}/100, player {player_id} scraped")
 
         except:
-            context.log.warning(f"Failed to scrape data for player {player_id}, {link}")
+            logger.warning(f"Failed to scrape data for player {player_id}, {link}", exc_info=True)
             continue
 
     # Write data to the bucket
-    write_to_bucket(context, gcs, "raw/players.csv", pd.DataFrame(players), "csv")
-    write_to_bucket(context, gcs, "raw/names.csv", pd.DataFrame(names), "csv")
-    write_to_bucket(context, gcs, "raw/actions.csv", pd.DataFrame(actions), "csv")
-    write_to_bucket(context, gcs, "raw/weapons.csv", pd.DataFrame(weapons), "csv")
-    write_to_bucket(context, gcs, "raw/frags.csv", pd.DataFrame(frags), "csv")
-    write_to_bucket(context, gcs, "raw/sessions.csv", pd.DataFrame(sessions), "csv")
-    write_to_bucket(context, gcs, "raw/events.csv", pd.DataFrame(events), "csv")
+    write_to_bucket("raw/players.csv", pd.DataFrame(players), "csv")
+    write_to_bucket("raw/names.csv", pd.DataFrame(names), "csv")
+    write_to_bucket("raw/actions.csv", pd.DataFrame(actions), "csv")
+    write_to_bucket("raw/weapons.csv", pd.DataFrame(weapons), "csv")
+    write_to_bucket("raw/frags.csv", pd.DataFrame(frags), "csv")
+    write_to_bucket("raw/sessions.csv", pd.DataFrame(sessions), "csv")
+    write_to_bucket("raw/events.csv", pd.DataFrame(events), "csv")
