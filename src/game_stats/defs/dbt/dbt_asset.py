@@ -18,3 +18,8 @@ dbt_project.prepare_if_dev()
 @dbt_assets(manifest=dbt_project.manifest_path)
 def dbt_models(context: dg.AssetExecutionContext, dbt: DbtCliResource):
     yield from dbt.cli(["build"], context=context).stream()
+
+
+@dg.asset
+def hello():
+    print("Hello")
