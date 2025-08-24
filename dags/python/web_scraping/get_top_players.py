@@ -49,4 +49,4 @@ def get_players_links():
         page_num += 1
 
     logger.info(f">>> Scraped {len(players)} / 100 links")
-    write_to_bucket(players, "top_100_players.json")
+    write_to_bucket("top_100_players.json", players)

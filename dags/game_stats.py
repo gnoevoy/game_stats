@@ -9,11 +9,9 @@ HOME_DIR = os.getenv("AIRFLOW_HOME")
 sys.path.append(f"{HOME_DIR}/dags")
 
 from python.web_scraping.get_top_players import get_players_links
+from python.web_scraping.get_players_data import get_players_stats
 
-# from python.extract_data import extract_data
-# from python.transform_data import transform_activity_data, transform_profile_data, transform_results_data
-# from python.update_file import check_file_update, is_file_updated, update_env_variable
-# from python.load_data import load_data
+
 # from dbt.dbt_script import dbt_group
 
 
@@ -24,6 +22,8 @@ def game_stats():
     @task_group(group_id="web_scraping")
     def web_scraping():
         t_get_players_links = get_players_links()
+        t_get_players_stats = get_players_stats()
+        t_get_players_links >> t_get_players_stats
 
     g_web_scraping = web_scraping()
 

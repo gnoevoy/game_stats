@@ -1,6 +1,6 @@
-from scraping_utils import get_general_info, get_player_actions, get_weapons_stats, get_frags_stats, get_my_profile_data
-
-# from dags.python.web_scraping.gcp_utils import write_to_bucket, read_from_bucket
+from python.web_scraping.scraping_utils import get_general_info, get_player_actions, get_weapons_stats, get_frags_stats, get_my_profile_data
+from python.web_scraping.gcp_utils import write_to_bucket, read_from_bucket
+from airflow.sdk import task
 import pandas as pd
 import logging
 import os
@@ -9,8 +9,9 @@ import os
 logger = logging.getLogger(__name__)
 
 
+@task()
 def get_players_stats():
-    logger.info("SCRAPING PLAYERS DATA")
+    logger.info(">>> SCRAPING PLAYERS DATA")
 
     # Get players links from the bucket
     links = read_from_bucket("top_100_players.json")
@@ -25,17 +26,17 @@ def get_players_stats():
     actions.extend(my_actions)
     weapons.extend(my_weapons)
     frags.extend(my_frags)
-    logger.info("Scraped my profile stats")
+    logger.info(">>> Scraped my profile stats")
 
     # Iterate through the list and scrape players data
-    for i, link in enumerate(links, start=1):
+    for i, link in enumerate(links[:3], start=1):
         # If something goes wrong, skip this player and display an error message
         try:
             player_id = link.split("=")[-1]
 
             # If my profile in top 100 -> skip it to avoid duplication
             if int(player_id) == my_id:
-                logger.info(f"{i}/100, skipping my profile")
+                logger.info(f">>> {i}/100, skipping my profile")
                 continue
 
             player_info, player_names = get_general_info(player_id, home_page)
@@ -53,10 +54,10 @@ def get_players_stats():
             actions.extend(player_actions)
             weapons.extend(player_weapons)
             frags.extend(player_frags)
-            logger.info(f"{i}/100, player {player_id} scraped")
+            logger.info(f">>> {i}/100, player {player_id} scraped")
 
         except:
-            logger.warning(f"Failed to scrape data for player {player_id}, {link}", exc_info=True)
+            logger.warning(f">>> Failed to scrape data for player {player_id}, {link}", exc_info=True)
             continue
 
     # Write data to the bucket
