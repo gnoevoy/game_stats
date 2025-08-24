@@ -2,17 +2,9 @@ game_stats:
   outputs:
     prod:
       method: oauth
-      dataset: game_stats
+      priority: interactive
+      dataset: "{{ env_var('DATASET_NAME') }}"
       project: "{{ env_var('GOOGLE_CLOUD_PROJECT_ID') }}"
-      threads: 64
-      type: bigquery
-
-    # Test dbt script in a Docker container
-    docker:
-      method: service-account
-      dataset: game_stats
-      project: "{{ env_var('GOOGLE_CLOUD_PROJECT_ID') }}"
-      keyfile: /root/gcloud_key.json
       threads: 64
       type: bigquery
 

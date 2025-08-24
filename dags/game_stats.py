@@ -10,9 +10,7 @@ sys.path.append(f"{HOME_DIR}/dags")
 
 from python.web_scraping.get_top_players import get_players_links
 from python.web_scraping.get_players_data import get_players_stats
-
-
-# from dbt.dbt_script import dbt_group
+from dbt.dbt_script import dbt_group
 
 
 @dag(schedule="@weekly", start_date=pendulum.datetime(2025, 1, 1, tz="UTC"), catchup=False)
@@ -26,6 +24,9 @@ def game_stats():
         t_get_players_links >> t_get_players_stats
 
     g_web_scraping = web_scraping()
+
+    # dbt
+    g_dbt = dbt_group(group_id="dbt_group")
 
     # Empty task to chain python and dbt groups
     # @task(trigger_rule="none_failed")
