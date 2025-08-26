@@ -2,7 +2,6 @@ game_stats:
   outputs:
     prod:
       method: oauth
-      priority: interactive
       dataset: "{{ env_var('DATASET_NAME') }}"
       project: "{{ env_var('GOOGLE_CLOUD_PROJECT_ID') }}"
       threads: 64

@@ -1,4 +1,4 @@
-from cosmos import DbtTaskGroup, ExecutionConfig, ProfileConfig, ProjectConfig, RenderConfig, LoadMode
+from cosmos import DbtTaskGroup, ExecutionConfig, ProfileConfig, ProjectConfig
 from cosmos.profiles import GoogleCloudServiceAccountDictProfileMapping
 import os
 
@@ -30,17 +30,14 @@ project_config = ProjectConfig(
 
 # Provide path to dbt virtual environment inside Airflow container
 execution_config = ExecutionConfig(dbt_executable_path=DBT_EXECUTABLE_PATH)
-render_config = RenderConfig(load_method=LoadMode.DBT_LS, dbt_deps=False)
 
 
-# Defines a dbt task group to visualize script execution order in the Airflow UI
+# Dbt task group to visualize script execution order in the Airflow UI
 def dbt_group(group_id):
     return DbtTaskGroup(
         group_id=group_id,
         project_config=project_config,
         profile_config=profile_config,
         execution_config=execution_config,
-        render_config=render_config,
-        default_args={"retries": 0},
-        operator_args={"install_deps": False},
+        default_args={"retries": 1},
     )

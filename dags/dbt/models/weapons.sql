@@ -6,6 +6,7 @@ with cte as (
 )
 
 select 
+    -- Create incremental ID's for each weapon
     ROW_NUMBER() OVER (ORDER BY weapon_name ASC) AS weapon_id,
     weapon_name
 from cte

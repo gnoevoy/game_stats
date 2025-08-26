@@ -9,7 +9,7 @@ import os
 logger = logging.getLogger(__name__)
 
 
-# 2 helper functions to read / write data to GCS
+# Helper functions to read / write data to GCS
 
 
 def read_from_bucket(blob_name, file_type="json"):

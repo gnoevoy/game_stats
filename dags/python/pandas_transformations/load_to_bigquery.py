@@ -8,7 +8,7 @@ def load_data(task_id, source_object, table):
     project_id = os.getenv("GOOGLE_CLOUD_PROJECT_ID")
     dataset = os.getenv("DATASET_NAME")
 
-    # Return an operator that transfer data from bucket to BigQuery
+    # Operator that transfer data from bucket to BigQuery
     return GCSToBigQueryOperator(
         task_id=task_id,
         bucket=bucket_name,

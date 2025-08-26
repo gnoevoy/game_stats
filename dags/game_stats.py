@@ -10,7 +10,7 @@ sys.path.append(f"{HOME_DIR}/dags")
 
 from python.web_scraping.get_top_players import get_players_links
 from python.web_scraping.get_players_data import get_players_stats
-from python.data_transformations.transform_data import (
+from python.pandas_transformations.transform_data import (
     transform_players_data,
     transform_player_names,
     transform_player_actions,
@@ -19,7 +19,7 @@ from python.data_transformations.transform_data import (
     transform_sessions,
     transform_events,
 )
-from python.data_transformations.load_to_bigquery import load_data
+from python.pandas_transformations.load_to_bigquery import load_data
 from dbt.dbt_script import dbt_group
 
 
@@ -32,6 +32,7 @@ def game_stats():
         t_get_players_links = get_players_links()
         t_get_players_stats = get_players_stats()
         t_get_players_links >> t_get_players_stats
+        
 
     # Data transformation
     @task_group(group_id="data_transformations")
@@ -67,6 +68,7 @@ def game_stats():
     g_data_transformations = data_transformations()
     g_dbt = dbt_group(group_id="dbt_group")
 
+    # Chain groups
     g_web_scraping >> g_data_transformations >> g_dbt
 
 
