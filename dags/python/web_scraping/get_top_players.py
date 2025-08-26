@@ -1,4 +1,4 @@
-from python.web_scraping.gcp_utils import write_to_bucket
+from python.gcp_utils import write_to_bucket
 from bs4 import BeautifulSoup
 from airflow.sdk import task
 import requests

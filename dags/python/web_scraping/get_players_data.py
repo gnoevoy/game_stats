@@ -1,5 +1,5 @@
 from python.web_scraping.scraping_utils import get_general_info, get_player_actions, get_weapons_stats, get_frags_stats, get_my_profile_data
-from python.web_scraping.gcp_utils import write_to_bucket, read_from_bucket
+from python.gcp_utils import write_to_bucket, read_from_bucket
 from airflow.sdk import task
 import pandas as pd
 import logging
@@ -29,7 +29,7 @@ def get_players_stats():
     logger.info(">>> Scraped my profile stats")
 
     # Iterate through the list and scrape players data
-    for i, link in enumerate(links[:3], start=1):
+    for i, link in enumerate(links, start=1):
         # If something goes wrong, skip this player and display an error message
         try:
             player_id = link.split("=")[-1]
