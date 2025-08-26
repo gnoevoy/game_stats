@@ -2,7 +2,7 @@ from dotenv import load_dotenv
 from pathlib import Path
 import sys
 
-# Append path
+# Append path to import scripts and env variables
 ROOT_DIR = Path(__file__).parents[1]
 sys.path.append(str(ROOT_DIR))
 

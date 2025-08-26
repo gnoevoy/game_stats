@@ -5,11 +5,10 @@ import pytz
 
 
 logger = logging.getLogger(__name__)
-pd.options.mode.chained_assignment = None
 server_timezone = pytz.timezone("Europe/Moscow")
 
 
-# Helper function to clean and transform csv files from the bucket
+# Helper function to clean and transform raw csv files from the bucket
 
 
 def transform_players_data(df):

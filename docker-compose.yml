@@ -18,8 +18,8 @@ services:
     environment:
       - name=value
 
-  data_transformations:
-    image: data_transformations
+  pandas:
+    image: pandas
     build:
       context: ./python
       dockerfile: Dockerfile.pandas

@@ -10,6 +10,7 @@ with cte as (
 ) 
 
 select 
+    -- Create incremental ID for each action
     ROW_NUMBER() OVER (ORDER BY action ASC) AS action_id,
     action,
     description

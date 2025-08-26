@@ -1,3 +1,5 @@
+# Configuration file for deploying code to Google Cloud
+
 steps:
 
   # Building images
@@ -7,9 +9,9 @@ steps:
     args: ["build", "-f", "Dockerfile.scraping", "-t", "$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/web-scraping:$COMMIT_SHA", "."]
     dir: "python/"
 
-  - id: "Build data-transformations image" 
+  - id: "Build pandas-transformations image" 
     name: gcr.io/cloud-builders/docker
-    args: ["build", "-f", "Dockerfile.pandas", "-t", "$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/data-transformations:$COMMIT_SHA", "."]
+    args: ["build", "-f", "Dockerfile.pandas", "-t", "$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/pandas-transformations:$COMMIT_SHA", "."]
     dir: "python/"
 
   - id: "Build dbt image" 
@@ -24,9 +26,9 @@ steps:
     name: gcr.io/cloud-builders/docker
     args: ["push", "$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/web-scraping:$COMMIT_SHA"]
 
-  - id: "Push data-transformations image" 
+  - id: "Push pandas-transformations image" 
     name: gcr.io/cloud-builders/docker
-    args: ["push", "$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/data-transformations:$COMMIT_SHA"]
+    args: ["push", "$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/pandas-transformations:$COMMIT_SHA"]
 
   - id: "Push dbt image" 
     name: gcr.io/cloud-builders/docker
@@ -48,12 +50,12 @@ steps:
       "--set-env-vars=BUCKET_NAME=$_BUCKET_NAME,DATASET_NAME=$_DATASET_NAME,BASE_URL=$_BASE_URL,GOOGLE_CLOUD_PROJECT_ID=$PROJECT_ID"
     ]
 
-  - id: "Deploy data-transformations container"
+  - id: "Deploy pandas-transformations container"
     name: gcr.io/google.com/cloudsdktool/cloud-sdk
     entrypoint: gcloud
     args: [
-      "run", "jobs", "deploy", "data-transformations",
-      "--image", "$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/data-transformations:$COMMIT_SHA",
+      "run", "jobs", "deploy", "pandas-transformations",
+      "--image", "$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/pandas-transformations:$COMMIT_SHA",
       "--region", "$_DEPLOY_REGION",
       "--project", "$PROJECT_ID",
       "--max-retries=1",
@@ -69,7 +71,7 @@ steps:
       "--region", "$_DEPLOY_REGION",
       "--project", "$PROJECT_ID",
       "--max-retries=1",
-      "--set-env-vars=GOOGLE_CLOUD_PROJECT_ID=$PROJECT_ID"
+      "--set-env-vars=GOOGLE_CLOUD_PROJECT_ID=$PROJECT_ID,DATASET_NAME=$_DATASET_NAME"
     ]
 
 

@@ -1,5 +1,5 @@
 -- History of leaderboard players
--- Used snapshot to track changes in player rankings over time
+-- Used snapshot to track changes in player rankings over time by rank column
 
 {{ config(materialized='snapshot', unique_key='player_id') }}
 

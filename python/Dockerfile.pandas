@@ -8,4 +8,4 @@ RUN pip install --no-cache-dir --upgrade -r requirements.txt
 
 COPY . .
 
-CMD [ "python", "data_transformations/main.py" ]
+CMD [ "python", "pandas_transformations/main.py" ]

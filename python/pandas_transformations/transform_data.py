@@ -45,6 +45,7 @@ def transform_tables():
     write_to_bucket("clean/events.csv", events, "csv")
 
 
+# Load cleaned csv files to BigQuery
 def load_to_bigquery():
     logger.info("LOADING DATA TO BIGQUERY")
     tables = ["players", "names", "actions", "weapons", "frags", "sessions", "events"]

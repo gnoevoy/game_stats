@@ -10,7 +10,6 @@ logs/
 .user.yml
 
 # Other
-venv/
+.venv
 .env
 *.json
-*.txt

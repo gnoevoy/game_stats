@@ -1,3 +1,5 @@
+# Configuration file that defines a sequence of jobs executed in Google Cloud Workflows.
+
 main:
   steps:
     # Set env variables
@@ -6,7 +8,7 @@ main:
           - project_id: ${sys.get_env("GOOGLE_CLOUD_PROJECT_ID")}
           - region: europe-central2
 
-    # Run sequentially jobs
+    # Chain python and dbt scripts
 
     - web_scraping:
         call: googleapis.run.v1.namespaces.jobs.run
@@ -14,14 +16,14 @@ main:
           name: ${"namespaces/" + project_id + "/jobs/" + "web-scraping"}
           location: ${region}
         result: web_scraping_result
-        next: data_transformations
+        next: pandas_transformations
 
-    - data_transformations:
+    - pandas_transformations:
         call: googleapis.run.v1.namespaces.jobs.run
         args:
-          name: ${"namespaces/" + project_id + "/jobs/" + "data-transformations"}
+          name: ${"namespaces/" + project_id + "/jobs/" + "pandas-transformations"}
           location: ${region}
-        result: data_transformations_result
+        result: pandas_transformations_result
         next: dbt
     
     - dbt:
@@ -30,7 +32,3 @@ main:
           name: ${"namespaces/" + project_id + "/jobs/" + "dbt"}
           location: ${region}     
         result: dbt_result
-        next: finish
-
-    - finish:
-        return: ${dbt_result}
