@@ -6,13 +6,13 @@
 
 **Used Tools:** `Python`, `SQL`, `dbt`, `Airflow`, `Git`, `Docker`, `Google Cloud Storage`, `BigQuery`, `Google Cloud Services`.
 
-**Result:** A regularly updated dataset in BigQuery, organized into fact and dimension tables. Pipeline orchestration is implemented in two versions: one with Apache Airflow and one with Google Cloud Services.
+### Result:
+
+A regularly updated dataset in BigQuery, organized into fact and dimension tables. The pipeline orchestration is implemented in two alternative approaches, each available in its own branch:  
+- [**gcp_pipeline**](https://github.com/gnoevoy/game_stats/tree/gcp-pipeline) → Containerized pipeline orchestrated with **Google Cloud services**.  
+- [**airflow**](https://github.com/gnoevoy/game_stats/tree/airflow) → Pipeline orchestrated with **Apache Airflow**, deployed using Astronomer.
 
 ![Dataset schema](images/schema.jpg)
-
-### Branches:
-- [**gcp_pipeline**](https://github.com/gnoevoy/game_stats/tree/gcp-pipeline) → Orchestration via Google Cloud services (Cloud Run, Workflows, Scheduler, Cloud Build)
-- [**airflow**](https://github.com/gnoevoy/game_stats/tree/airflow) → Orhestration via Apache Airflow (deployed with Astronomer)
 
 
 <br>
@@ -24,7 +24,7 @@
 
 ### Python:
 - Used `requests` and `BeautifulSoup4` for scraping player stats
-- Applied `pandas` for cleaning and transforming raw data into structured format
+- Applied `pandas` for cleaning and transforming raw data 
 - Implemented structured logging with Python's `logging` module
 - Added `try-except` blocks for robust error handling
 - Organized scripts modularly across multiple files
@@ -79,9 +79,9 @@ This architecture automates a data pipeline using Google Cloud services. Code is
 - Configured the DAG to run on a weekly schedule using `@weekly` option
 - Used groups with the `@task_group` decorator to separate logic
 - Credentials and variables managed through Astronomer UI and `.env` locally
-- Google Cloud `hooks` and `operators` used for reading/writing GCS data and loading to BigQuery
+- Used Google Cloud `hooks` and `operators` for reading/writing GCS data and loading to BigQuery
 - Integrated `dbt` via `Cosmos` module to visualize the project and run models in the DAG
 
-Pipeline is developed locally with `Astro CLI` and deployed to the cloud through `Astronomer`. This setup provides an easy way to test and iterate on DAGs during development, while Astronomer simplifies deployment and management in production with a straightforward UI and built-in environment handling.
+The pipeline is built and tested locally using the `Astro CLI`, then deployed to the cloud with **Astronomer**. This approach allows quick iteration on DAGs during development, while Astronomer handles production deployment, monitoring, and environment management through a simple UI.  
 
 [**Go to airflow branch**](https://github.com/gnoevoy/game_stats/tree/airflow)

@@ -124,7 +124,6 @@ def transform_sessions(df):
     return df
 
 
-# Change this one
 def transform_events(df):
     values = df["value"].str.split("\n")
 
