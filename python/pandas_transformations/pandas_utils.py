@@ -107,7 +107,7 @@ def transform_player_frags(df):
 def transform_sessions(df):
     values = df["value"].str.split("\n")
 
-    # Get simle columns
+    # Get simple columns
     df["date"] = values.str[0].astype("datetime64[ns]")
     df["experience_change"] = values.str[1].astype(int)
     df["experience"] = values.str[2].str.replace(",", "").astype(int)
@@ -124,6 +124,7 @@ def transform_sessions(df):
     return df
 
 
+# Change this one
 def transform_events(df):
     values = df["value"].str.split("\n")
 

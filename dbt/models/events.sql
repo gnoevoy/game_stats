@@ -1,3 +1,6 @@
+-- Change this one, unique key + Remove entire table before run
+
+
 -- History of my actions on the server (logs of events on the server)
 -- Combination of timestamp and event_index allows correctly order dataset if some events occured at the same time
 -- Used incremental model to append only new events

@@ -156,6 +156,7 @@ def get_my_sessions(player_id, home_page):
     return sessions
 
 
+# Change this one (sort ascending + incremental index add to dictionary)
 # Extract events history with timestamps for my profile
 def get_my_games_events(player_id, home_page):
     num = 1
