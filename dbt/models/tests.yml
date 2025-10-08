@@ -1,6 +1,6 @@
 version: 2
 
-# Tests to check relationships between tables
+# Tests relationships between tables
 
 models:
   - name: player_actions

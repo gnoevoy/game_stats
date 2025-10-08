@@ -2,7 +2,7 @@
 -- Combination of timestamp and event_index allows correctly order dataset if some events occured at the same time
 -- Used incremental model to append only new events
 
-{{ config(materialized='incremental', unique_key=["timestamp", "description"]) }}
+{{ config(materialized='incremental', unique_key=["timestamp", "event_index"]) }}
 
 with cte as (
    select

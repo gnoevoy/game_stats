@@ -27,18 +27,18 @@ def get_players_links():
     logger.info("GET TOP 100 PLAYERS LINKS")
 
     # Set up base URL
-    home_page = os.getenv("BASE_URL")
+    HOME_PAGE = os.getenv("BASE_URL")
     players, page_num = [], 1
 
     # Loop through the first two pages and get top 100 players
     while page_num <= 2:
-        url = f"{home_page}hlstats.php?mode=players&game=css&sort=skill&sortorder=desc&page={page_num}"
+        url = f"{HOME_PAGE}hlstats.php?mode=players&game=css&sort=skill&sortorder=desc&page={page_num}"
         response = requests.get(url)
 
         # Check if the request was successful
         if response.status_code == 200:
             content = response.content
-            links = get_links(content, home_page)
+            links = get_links(content, HOME_PAGE)
             players.extend(links)
         else:
             logger.error(f"Failed to retrieve page {page_num}: {response.status_code}")

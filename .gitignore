@@ -2,14 +2,14 @@
 __pycache__/
 example.*
 
-# dbt
+# DBT
 target/
 dbt_modules/
 dbt_packages/
 logs/
 .user.yml
 
-# Other
+# Env variables & Secrets
 .venv
 .env
 *.json

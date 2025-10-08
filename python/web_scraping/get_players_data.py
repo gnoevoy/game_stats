@@ -13,12 +13,14 @@ def get_players_stats():
 
     # Get players links from the bucket
     links = read_from_bucket("top_100_players.json")
-    home_page = os.getenv("BASE_URL")
+    logger.info(f"Extracted {len(links)}/100 records")
+
+    HOME_PAGE = os.getenv("BASE_URL")
     players, names, actions, weapons, frags = [], [], [], [], []
 
     # Extract my own stats first, since I could not be present in the top 100 players
     my_id = 4720
-    general_info, my_names, my_actions, my_weapons, my_frags, sessions, events = get_my_profile_data(my_id, home_page)
+    general_info, my_names, my_actions, my_weapons, my_frags, sessions, events = get_my_profile_data(my_id, HOME_PAGE)
     players.append(general_info)
     names.extend(my_names)
     actions.extend(my_actions)
@@ -28,7 +30,7 @@ def get_players_stats():
 
     # Iterate through the list and scrape players data
     for i, link in enumerate(links, start=1):
-        # If something goes wrong, skip this player and display an error message
+        # If something goes wrong, skip this player and display a warning message
         try:
             player_id = link.split("=")[-1]
 
@@ -37,10 +39,10 @@ def get_players_stats():
                 logger.info(f"{i}/100, skipping my profile")
                 continue
 
-            player_info, player_names = get_general_info(player_id, home_page)
-            player_actions, ct_side_peaks, t_side_peaks = get_player_actions(player_id, home_page)
-            player_weapons = get_weapons_stats(player_id, home_page)
-            player_frags = get_frags_stats(player_id, home_page)
+            player_info, player_names = get_general_info(player_id, HOME_PAGE)
+            player_actions, ct_side_peaks, t_side_peaks = get_player_actions(player_id, HOME_PAGE)
+            player_weapons = get_weapons_stats(player_id, HOME_PAGE)
+            player_frags = get_frags_stats(player_id, HOME_PAGE)
 
             # Append team side peaks to general player info
             player_info["CT_side_peaks"] = ct_side_peaks

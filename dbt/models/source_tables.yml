@@ -1,6 +1,6 @@
 version: 2
 
-# Import all tables for reference in models
+# Import all source tables
 
 sources:
   - name: game_stats 

@@ -15,8 +15,6 @@ services:
       context: ./python
       dockerfile: Dockerfile.scraping
     <<: *secrets
-    environment:
-      - name=value
 
   pandas:
     image: pandas

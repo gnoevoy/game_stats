@@ -17,32 +17,27 @@ logger = logging.getLogger(__name__)
 def transform_tables():
     logger.info("DATA TRANSFORMATIONS")
 
-    # Read csv files from the bucket
-    players_df = read_from_bucket("raw/players.csv", "csv")
-    names_df = read_from_bucket("raw/names.csv", "csv")
-    actions_df = read_from_bucket("raw/actions.csv", "csv")
-    weapons_df = read_from_bucket("raw/weapons.csv", "csv")
-    frags_df = read_from_bucket("raw/frags.csv", "csv")
-    sessions_df = read_from_bucket("raw/sessions.csv", "csv")
-    events_df = read_from_bucket("raw/events.csv", "csv")
+    data = [
+        ("raw/players.csv", transform_players_data, "clean/players.csv"),
+        ("raw/names.csv", transform_player_names, "clean/names.csv"),
+        ("raw/actions.csv", transform_player_actions, "clean/actions.csv"),
+        ("raw/weapons.csv", transform_player_weapons, "clean/weapons.csv"),
+        ("raw/frags.csv", transform_player_frags, "clean/frags.csv"),
+        ("raw/sessions.csv", transform_sessions, "clean/sessions.csv"),
+        ("raw/events.csv", transform_events, "clean/events.csv"),
+    ]
 
-    # Transform dataframes
-    players = transform_players_data(players_df)
-    names = transform_player_names(names_df)
-    actions = transform_player_actions(actions_df)
-    weapons = transform_player_weapons(weapons_df)
-    frags = transform_player_frags(frags_df)
-    sessions = transform_sessions(sessions_df)
-    events = transform_events(events_df)
+    # For each file apply transformation logic and write back to the bucket
+    for raw_path, func, clean_path in data:
+        df = read_from_bucket(raw_path, "csv")
 
-    # Write dataframes to the bucket
-    write_to_bucket("clean/players.csv", players, "csv")
-    write_to_bucket("clean/names.csv", names, "csv")
-    write_to_bucket("clean/actions.csv", actions, "csv")
-    write_to_bucket("clean/weapons.csv", weapons, "csv")
-    write_to_bucket("clean/frags.csv", frags, "csv")
-    write_to_bucket("clean/sessions.csv", sessions, "csv")
-    write_to_bucket("clean/events.csv", events, "csv")
+        # Check if dataframe has records
+        if df.empty:
+            logger.warning(f"{raw_path} is empty, skipping transformation and upload")
+            continue
+
+        cleaned_df = func(df)
+        write_to_bucket(clean_path, cleaned_df, "csv")
 
 
 # Load cleaned csv files to BigQuery

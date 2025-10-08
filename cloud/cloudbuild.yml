@@ -2,83 +2,84 @@
 
 steps:
 
-  # Building images
+  # Build 
 
   - id: "Build web-scraping image" 
     name: gcr.io/cloud-builders/docker
     args: ["build", "-f", "Dockerfile.scraping", "-t", "$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/web-scraping:$COMMIT_SHA", "."]
     dir: "python/"
-
-  - id: "Build pandas-transformations image" 
-    name: gcr.io/cloud-builders/docker
-    args: ["build", "-f", "Dockerfile.pandas", "-t", "$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/pandas-transformations:$COMMIT_SHA", "."]
-    dir: "python/"
-
-  - id: "Build dbt image" 
-    name: gcr.io/cloud-builders/docker
-    args: ["build", "-t", "$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/dbt:$COMMIT_SHA", "."]
-    dir: "dbt/"
-
-
-  # Pushing images to Artifact Registry
-
+    
   - id: "Push web-scraping image" 
     name: gcr.io/cloud-builders/docker
     args: ["push", "$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/web-scraping:$COMMIT_SHA"]
 
-  - id: "Push pandas-transformations image" 
-    name: gcr.io/cloud-builders/docker
-    args: ["push", "$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/pandas-transformations:$COMMIT_SHA"]
+  # - id: "Build data-transformations image" 
+  #   name: gcr.io/cloud-builders/docker
+  #   args: ["build", "-f", "Dockerfile.pandas", "-t", "$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/data-transformations:$COMMIT_SHA", "."]
+  #   dir: "python/"
 
-  - id: "Push dbt image" 
-    name: gcr.io/cloud-builders/docker
-    args: ["push", "$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/dbt:$COMMIT_SHA"]
-
-
-  # Deploying containers to Cloud Run Jobs
-
-  - id: "Deploy web-scraping container"
-    name: gcr.io/google.com/cloudsdktool/cloud-sdk
-    entrypoint: gcloud
-    args: [
-      "run", "jobs", "deploy", "web-scraping",
-      "--image", "$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/web-scraping:$COMMIT_SHA",
-      "--region", "$_DEPLOY_REGION",
-      "--project", "$PROJECT_ID",
-      "--max-retries=0",
-      "--task-timeout=30m",
-      "--set-env-vars=BUCKET_NAME=$_BUCKET_NAME,DATASET_NAME=$_DATASET_NAME,BASE_URL=$_BASE_URL,GOOGLE_CLOUD_PROJECT_ID=$PROJECT_ID"
-    ]
-
-  - id: "Deploy pandas-transformations container"
-    name: gcr.io/google.com/cloudsdktool/cloud-sdk
-    entrypoint: gcloud
-    args: [
-      "run", "jobs", "deploy", "pandas-transformations",
-      "--image", "$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/pandas-transformations:$COMMIT_SHA",
-      "--region", "$_DEPLOY_REGION",
-      "--project", "$PROJECT_ID",
-      "--max-retries=1",
-      "--set-env-vars=BUCKET_NAME=$_BUCKET_NAME,DATASET_NAME=$_DATASET_NAME,BASE_URL=$_BASE_URL,GOOGLE_CLOUD_PROJECT_ID=$PROJECT_ID"
-    ]
-
-  - id: "Deploy dbt container"
-    name: gcr.io/google.com/cloudsdktool/cloud-sdk
-    entrypoint: gcloud
-    args: [
-      "run", "jobs", "deploy", "dbt",
-      "--image", "$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/dbt:$COMMIT_SHA",
-      "--region", "$_DEPLOY_REGION",
-      "--project", "$PROJECT_ID",
-      "--max-retries=1",
-      "--set-env-vars=GOOGLE_CLOUD_PROJECT_ID=$PROJECT_ID,DATASET_NAME=$_DATASET_NAME"
-    ]
+  # - id: "Build dbt image" 
+  #   name: gcr.io/cloud-builders/docker
+  #   args: ["build", "-t", "$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/dbt:$COMMIT_SHA", "."]
+  #   dir: "dbt/"
 
 
-  # Update YAML file for Workflows
-  - id: "Update YAML file to Workflows"
-    name: 'gcr.io/cloud-builders/gcloud'
-    args: ['workflows', 'deploy', '$_WORKFLOW_NAME', '--source', 'cloud/workflow.yml', "--location", "$_DEPLOY_REGION"]   
+  # Pushing images to Artifact Registry
+
+
+  # - id: "Push pandas-transformations image" 
+  #   name: gcr.io/cloud-builders/docker
+  #   args: ["push", "$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/data-transformations:$COMMIT_SHA"]
+
+  # - id: "Push dbt image" 
+  #   name: gcr.io/cloud-builders/docker
+  #   args: ["push", "$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/dbt:$COMMIT_SHA"]
+
+
+  # # Deploying containers to Cloud Run Jobs
+
+  # - id: "Deploy web-scraping container"
+  #   name: gcr.io/google.com/cloudsdktool/cloud-sdk
+  #   entrypoint: gcloud
+  #   args: [
+  #     "run", "jobs", "deploy", "web-scraping",
+  #     "--image", "$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/web-scraping:$COMMIT_SHA",
+  #     "--region", "$_DEPLOY_REGION",
+  #     "--project", "$PROJECT_ID",
+  #     "--max-retries=0",
+  #     "--task-timeout=30m",
+  #     "--set-env-vars=BUCKET_NAME=$_BUCKET_NAME,DATASET_NAME=$_DATASET_NAME,BASE_URL=$_BASE_URL,GOOGLE_CLOUD_PROJECT_ID=$PROJECT_ID"
+  #   ]
+
+  # - id: "Deploy pandas-transformations container"
+  #   name: gcr.io/google.com/cloudsdktool/cloud-sdk
+  #   entrypoint: gcloud
+  #   args: [
+  #     "run", "jobs", "deploy", "pandas-transformations",
+  #     "--image", "$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/pandas-transformations:$COMMIT_SHA",
+  #     "--region", "$_DEPLOY_REGION",
+  #     "--project", "$PROJECT_ID",
+  #     "--max-retries=1",
+  #     "--set-env-vars=BUCKET_NAME=$_BUCKET_NAME,DATASET_NAME=$_DATASET_NAME,BASE_URL=$_BASE_URL,GOOGLE_CLOUD_PROJECT_ID=$PROJECT_ID"
+  #   ]
+
+  # - id: "Deploy dbt container"
+  #   name: gcr.io/google.com/cloudsdktool/cloud-sdk
+  #   entrypoint: gcloud
+  #   args: [
+  #     "run", "jobs", "deploy", "dbt",
+  #     "--image", "$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/dbt:$COMMIT_SHA",
+  #     "--region", "$_DEPLOY_REGION",
+  #     "--project", "$PROJECT_ID",
+  #     "--max-retries=1",
+  #     "--set-env-vars=GOOGLE_CLOUD_PROJECT_ID=$PROJECT_ID,DATASET_NAME=$_DATASET_NAME"
+  #   ]
+
+
+  # # Update YAML file for Workflows
+  # - id: "Update YAML file to Workflows"
+  #   name: 'gcr.io/cloud-builders/gcloud'
+  #   args: ['workflows', 'deploy', '$_WORKFLOW_NAME', '--source', 'cloud/workflow.yml', "--location", "$_DEPLOY_REGION"]   
 
 options:
   logging: CLOUD_LOGGING_ONLY

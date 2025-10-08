@@ -8,12 +8,12 @@ import os
 logger = logging.getLogger(__name__)
 
 # Bucket settings
-bucket_name = os.getenv("BUCKET_NAME")
+BUCKET_NAME = os.getenv("BUCKET_NAME")
 storage_client = storage.Client()
-bucket = storage_client.bucket(bucket_name)
+bucket = storage_client.bucket(BUCKET_NAME)
 
 # BigQuery settings
-bigquery_project_id = os.getenv("GOOGLE_CLOUD_PROJECT_ID")
+PROJECT_ID = os.getenv("GOOGLE_CLOUD_PROJECT_ID")
 bigquery_dataset = os.getenv("DATASET_NAME")
 bigquery_client = bigquery.Client()
 
@@ -31,14 +31,14 @@ def write_to_bucket(blob_name, data, file_type="json"):
         content = json.dumps(data, indent=4, ensure_ascii=False)
         blob.upload_from_string(content, content_type="application/json")
 
-    logger.info(f"Data written to bucket as {blob_name}")
+    logger.info(f"{blob_name} written to bucket, {len(data)} records")
 
 
 def read_from_bucket(blob_name, file_type="json"):
     blob = bucket.blob(blob_name)
 
     if file_type == "csv":
-        df = pd.read_csv(f"gs://{bucket_name}/{blob_name}")
+        df = pd.read_csv(f"gs://{BUCKET_NAME}/{blob_name}")
         logger.info(f"File {blob_name} extracted from bucket")
         return df
     else:
@@ -47,9 +47,10 @@ def read_from_bucket(blob_name, file_type="json"):
         return content
 
 
+# Load csv file from bucket to BigQuery
 def write_to_bigquery(bucket_path, table_name):
-    gcs_uri = f"gs://{bucket_name}/{bucket_path}"
-    table_id = f"{bigquery_project_id}.{bigquery_dataset}.{table_name}"
+    gcs_uri = f"gs://{BUCKET_NAME}/{bucket_path}"
+    table_id = f"{PROJECT_ID}.{bigquery_dataset}.{table_name}"
 
     job_config = bigquery.LoadJobConfig(
         source_format=bigquery.SourceFormat.CSV,
@@ -61,4 +62,6 @@ def write_to_bigquery(bucket_path, table_name):
 
     load_job = bigquery_client.load_table_from_uri(gcs_uri, table_id, job_config=job_config)
     load_job.result()
-    logger.info(f"Table {table_name} loaded to BigQuery")
+
+    destination_table = bigquery_client.get_table(table_id)
+    logger.info(f"Table {table_name} loaded to BigQuery, {destination_table.num_rows} rows")
