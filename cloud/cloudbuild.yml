@@ -8,32 +8,31 @@ steps:
     name: gcr.io/cloud-builders/docker
     args: ["build", "-f", "Dockerfile.scraping", "-t", "$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/web-scraping:$COMMIT_SHA", "."]
     dir: "python/"
-    
-  - id: "Push web-scraping image" 
+
+  - id: "Build data-transformations image" 
     name: gcr.io/cloud-builders/docker
-    args: ["push", "$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/web-scraping:$COMMIT_SHA"]
+    args: ["build", "-f", "Dockerfile.pandas", "-t", "$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/data-transformations:$COMMIT_SHA", "."]
+    dir: "python/"
 
-  # - id: "Build data-transformations image" 
-  #   name: gcr.io/cloud-builders/docker
-  #   args: ["build", "-f", "Dockerfile.pandas", "-t", "$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/data-transformations:$COMMIT_SHA", "."]
-  #   dir: "python/"
-
-  # - id: "Build dbt image" 
-  #   name: gcr.io/cloud-builders/docker
-  #   args: ["build", "-t", "$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/dbt:$COMMIT_SHA", "."]
-  #   dir: "dbt/"
+  - id: "Build dbt image" 
+    name: gcr.io/cloud-builders/docker
+    args: ["build", "-t", "$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/dbt:$COMMIT_SHA", "."]
+    dir: "dbt/"
 
 
   # Pushing images to Artifact Registry
 
+  - id: "Push web-scraping image" 
+    name: gcr.io/cloud-builders/docker
+    args: ["push", "$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/game_stats_scraping:$COMMIT_SHA"]
 
-  # - id: "Push pandas-transformations image" 
-  #   name: gcr.io/cloud-builders/docker
-  #   args: ["push", "$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/data-transformations:$COMMIT_SHA"]
+  - id: "Push pandas-transformations image" 
+    name: gcr.io/cloud-builders/docker
+    args: ["push", "$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/game_stats_pandas:$COMMIT_SHA"]
 
-  # - id: "Push dbt image" 
-  #   name: gcr.io/cloud-builders/docker
-  #   args: ["push", "$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/dbt:$COMMIT_SHA"]
+  - id: "Push dbt image" 
+    name: gcr.io/cloud-builders/docker
+    args: ["push", "$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/game_stats_dbt:$COMMIT_SHA"]
 
 
   # # Deploying containers to Cloud Run Jobs
