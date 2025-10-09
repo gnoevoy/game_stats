@@ -2,7 +2,7 @@ from bs4 import BeautifulSoup
 import requests
 
 
-# 4 helper functions to transform players data + 3 for my profile
+# Web scraping functions to get players data across website
 # All functions have almost the same logic: make request -> render HTML content -> find elements ->  scrape data -> save it as a variable
 
 
@@ -14,7 +14,8 @@ def get_parsed_html(url):
     return soup
 
 
-def get_general_info(player_id, home_page):
+# Get current player stats
+def get_general_info(player_id, home_page, timestamp):
     # Make request and parse the HTML content
     url = f"{home_page}hlstats.php?mode=playerinfo&type=ajax&game=css&tab=general_aliases&player={player_id}"
     soup = get_parsed_html(url)
@@ -30,7 +31,7 @@ def get_general_info(player_id, home_page):
         names_table = tables[8].find_all("tr")
         for row in names_table[1:]:
             value = row.text.strip()
-            name = {"player_id": player_id, "value": value}
+            name = {"player_id": player_id, "value": value, "timestamp": timestamp}
             names.append(name)
 
     dct = {
@@ -43,18 +44,17 @@ def get_general_info(player_id, home_page):
         "deaths": right_table[11].text.strip(),
         "headshots": right_table[9].text.strip(),
         "frags_per_minute": right_table[4].text.strip(),
+        "timestamp": timestamp,
     }
     return dct, names
 
 
-def get_player_actions(player_id, home_page):
+# Get player actions for the last 30
+def get_player_actions(player_id, home_page, timestamp):
     sort_order = "&obj_sort=obj_count&obj_sortorder=desc&teams_sort=name&teams_sortorder=asc"
     url = f"{home_page}hlstats.php?mode=playerinfo&type=ajax&game=css&tab=playeractions_teams&player={player_id}{sort_order}"
     soup = get_parsed_html(url)
     tables = soup.find_all("table", class_="data-table")
-
-    # Player actions for the last 30 days
-
     actions = []
     ct_side, t_side = None, None
 
@@ -62,7 +62,7 @@ def get_player_actions(player_id, home_page):
     if not tables:
         return actions, ct_side, t_side
 
-    # If there's only one table, scrape team peaks
+    # Check if only side peaks table exists
     elif len(tables) == 1:
         side_peak_table = tables[0].find_all("tr")
         ct_side = side_peak_table[1].text.strip() if len(side_peak_table) > 1 else None
@@ -81,13 +81,14 @@ def get_player_actions(player_id, home_page):
         if len(actions_table) > 2:
             for row in actions_table[2:]:
                 value = row.text.strip()
-                action = {"player_id": player_id, "action": value}
+                action = {"player_id": player_id, "action": value, "timestamp": timestamp}
                 actions.append(action)
 
         return actions, ct_side, t_side
 
 
-def get_weapons_stats(player_id, home_page):
+# Get player weapons stats for the last 30 days
+def get_weapons_stats(player_id, home_page, timestamp):
     url = f"{home_page}hlstats.php?mode=playerinfo&type=ajax&game=css&tab=weapons&player={player_id}&weap_sort=kills"
     soup = get_parsed_html(url)
     table = soup.find("table", class_="data-table")
@@ -99,21 +100,22 @@ def get_weapons_stats(player_id, home_page):
             # Get weapon name from the image + stats
             weapon_name = row.find("img")["src"].split("/")[-1][:-4]
             value = row.text.strip()
-            weapon_stats = {"player_id": player_id, "weapon_name": weapon_name, "value": value}
+            weapon_stats = {"player_id": player_id, "weapon_name": weapon_name, "value": value, "timestamp": timestamp}
             weapons.append(weapon_stats)
         return weapons
 
     return weapons
 
 
-def get_frags_stats(player_id, home_page):
-    sort_order = "&killLimit=5&playerkills_sort=kills&playerkills_sortorder=desc"
+# Get player frags stats for the last 30 days
+def get_frags_stats(player_id, home_page, timestamp):
+    sort_order = "killLimit=5&playerkills_sort=kills&playerkills_sortorder=desc"
     num = 1
     lst = []
 
-    # Iterate through the pages with most kills
-    while num <= 4:
-        url = f"{home_page}hlstats.php?mode=playerinfo&type=ajax&game=css&tab=killstats&player={player_id}{sort_order}&playerkills_page={num}"
+    # Iterate through all pages with frags
+    while True:
+        url = f"{home_page}hlstats.php?mode=playerinfo&type=ajax&game=css&tab=killstats&player={player_id}&{sort_order}&playerkills_page={num}"
         response = requests.get(url)
 
         # Check if the page exists
@@ -124,25 +126,32 @@ def get_frags_stats(player_id, home_page):
         soup = BeautifulSoup(content, "html.parser")
         table = soup.find("table", class_="data-table")
 
+        # Check if the element exists
         if not table:
             break
-        else:
-            frags = []
-            for row in table.find_all("tr")[1:]:
-                # Get the killed player ID for identification
-                killed_player_id = row.find("a")["href"].split("=")[-1]
-                value = row.text.strip()
-                frag = {"player_id": player_id, "killed_player_id": killed_player_id, "value": value}
-                frags.append(frag)
 
-            lst.extend(frags)
-            num += 1
+        frags = []
+        records = table.find_all("tr")[1:]
+
+        # Check if there are records in the table
+        if not records:
+            break
+
+        for row in records:
+            # Get the killed player ID for identification
+            killed_player_id = row.find("a")["href"].split("=")[-1]
+            value = row.text.strip()
+            frag = {"player_id": player_id, "killed_player_id": killed_player_id, "value": value, "timestamp": timestamp}
+            frags.append(frag)
+
+        lst.extend(frags)
+        num += 1
 
     return lst
 
 
-# Get my profile sessions
-def get_my_sessions(player_id, home_page):
+# Get my profile sessions for the last 30 days
+def get_my_sessions(player_id, home_page, timestamp):
     url = f"{home_page}hlstats.php?mode=playersessions&player={player_id}"
     soup = get_parsed_html(url)
     table = soup.find("table", class_="data-table")
@@ -151,19 +160,19 @@ def get_my_sessions(player_id, home_page):
     if table:
         for row in table.find_all("tr")[1:]:
             session = row.text.strip()
-            dct = {"value": session}
+            dct = {"value": session, "timestamp": timestamp}
             sessions.append(dct)
     return sessions
 
 
-# Extract events history with timestamps for my profile
-def get_my_games_events(player_id, home_page):
-    num = 1
+# Extract logs for my profile for the last 30 days
+def get_my_games_events(player_id, home_page, timestamp):
+    num, event_index = 1, 1
     lst = []
 
     # Loop over unknown amount of pages and extract logs
     while True:
-        url = f"{home_page}hlstats.php?mode=playerhistory&player={player_id}&page={num}"
+        url = f"{home_page}hlstats.php?mode=playerhistory&sortorder=asc&player={player_id}&page={num}"
         response = requests.get(url)
 
         # Check if the page exists
@@ -179,8 +188,10 @@ def get_my_games_events(player_id, home_page):
             events = []
             for row in table.find_all("tr")[1:]:
                 event = row.text.strip()
-                dct = {"value": event}
+                # Add incremental event index to correctly order events that happened at the same time
+                dct = {"value": event, "event_index": event_index, "timestamp": timestamp}
                 events.append(dct)
+                event_index += 1
 
             lst.extend(events)
             num += 1
@@ -191,13 +202,13 @@ def get_my_games_events(player_id, home_page):
 
 
 # Combine all helper functions to scrape my profile stats
-def get_my_profile_data(player_id, home_page):
-    general_info, names = get_general_info(player_id, home_page)
-    actions, ct_side_peaks, t_side_peaks = get_player_actions(player_id, home_page)
-    weapons = get_weapons_stats(player_id, home_page)
-    frags = get_frags_stats(player_id, home_page)
-    sessions = get_my_sessions(player_id, home_page)
-    events = get_my_games_events(player_id, home_page)
+def get_my_profile_data(player_id, home_page, timestamp):
+    general_info, names = get_general_info(player_id, home_page, timestamp)
+    actions, ct_side_peaks, t_side_peaks = get_player_actions(player_id, home_page, timestamp)
+    weapons = get_weapons_stats(player_id, home_page, timestamp)
+    frags = get_frags_stats(player_id, home_page, timestamp)
+    sessions = get_my_sessions(player_id, home_page, timestamp)
+    events = get_my_games_events(player_id, home_page, timestamp)
 
     # Append team side peaks to general player info
     general_info["CT_side_peaks"] = ct_side_peaks

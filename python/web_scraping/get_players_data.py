@@ -1,5 +1,6 @@
 from scraping_utils import get_general_info, get_player_actions, get_weapons_stats, get_frags_stats, get_my_profile_data
 from gcp_utils import write_to_bucket, read_from_bucket
+from datetime import datetime, timezone
 import pandas as pd
 import logging
 import os
@@ -17,10 +18,11 @@ def get_players_stats():
 
     HOME_PAGE = os.getenv("BASE_URL")
     players, names, actions, weapons, frags = [], [], [], [], []
+    timestamp = datetime.now(timezone.utc)
 
     # Extract my own stats first, since I could not be present in the top 100 players
     my_id = 4720
-    general_info, my_names, my_actions, my_weapons, my_frags, sessions, events = get_my_profile_data(my_id, HOME_PAGE)
+    general_info, my_names, my_actions, my_weapons, my_frags, sessions, events = get_my_profile_data(my_id, HOME_PAGE, timestamp)
     players.append(general_info)
     names.extend(my_names)
     actions.extend(my_actions)
@@ -39,10 +41,10 @@ def get_players_stats():
                 logger.info(f"{i}/100, skipping my profile")
                 continue
 
-            player_info, player_names = get_general_info(player_id, HOME_PAGE)
-            player_actions, ct_side_peaks, t_side_peaks = get_player_actions(player_id, HOME_PAGE)
-            player_weapons = get_weapons_stats(player_id, HOME_PAGE)
-            player_frags = get_frags_stats(player_id, HOME_PAGE)
+            player_info, player_names = get_general_info(player_id, HOME_PAGE, timestamp)
+            player_actions, ct_side_peaks, t_side_peaks = get_player_actions(player_id, HOME_PAGE, timestamp)
+            player_weapons = get_weapons_stats(player_id, HOME_PAGE, timestamp)
+            player_frags = get_frags_stats(player_id, HOME_PAGE, timestamp)
 
             # Append team side peaks to general player info
             player_info["CT_side_peaks"] = ct_side_peaks
