@@ -27,7 +27,7 @@ from get_players_data import get_players_stats
 
 def main():
     logger_setup()
-    get_players_links()
+    # get_players_links()
     get_players_stats()
 
 
