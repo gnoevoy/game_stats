@@ -18,17 +18,19 @@ def transform_tables():
     logger.info("DATA TRANSFORMATIONS")
 
     data = [
-        ("raw/players.csv", transform_players_data, "clean/players.csv"),
-        ("raw/names.csv", transform_player_names, "clean/names.csv"),
-        ("raw/actions.csv", transform_player_actions, "clean/actions.csv"),
-        ("raw/weapons.csv", transform_player_weapons, "clean/weapons.csv"),
-        ("raw/frags.csv", transform_player_frags, "clean/frags.csv"),
-        ("raw/sessions.csv", transform_sessions, "clean/sessions.csv"),
-        ("raw/events.csv", transform_events, "clean/events.csv"),
+        ["players", transform_players_data],
+        ["names", transform_player_names],
+        ["actions", transform_player_actions],
+        ["weapons", transform_player_weapons],
+        ["frags", transform_player_frags],
+        ["sessions", transform_sessions],
+        ["events", transform_events],
     ]
 
-    # For each file apply transformation logic and write back to the bucket
-    for raw_path, func, clean_path in data:
+    # Loop through all raw csv files
+    for file, func in data:
+        raw_path = f"raw/{file}.csv"
+        clean_path = f"clean/{file}.csv"
         df = read_from_bucket(raw_path, "csv")
 
         # Check if dataframe has records
@@ -37,6 +39,7 @@ def transform_tables():
             continue
 
         cleaned_df = func(df)
+        logger.info(f"{file} csv file transformed successfully")
         write_to_bucket(clean_path, cleaned_df, "csv")
 
 
