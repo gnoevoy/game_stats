@@ -5,6 +5,7 @@ game_stats:
       dataset: "{{ env_var('DATASET_NAME') }}"
       project: "{{ env_var('GOOGLE_CLOUD_PROJECT_ID') }}"
       threads: 64
+      location: EU
       type: bigquery
 
     # Test dbt script in a Docker container
@@ -14,6 +15,7 @@ game_stats:
       project: "{{ env_var('GOOGLE_CLOUD_PROJECT_ID') }}"
       keyfile: /root/gcloud_key.json
       threads: 64
+      location: EU
       type: bigquery
 
   target: prod

@@ -14,10 +14,13 @@ clean-targets:
 
 models:
   game_stats:
-    # Store final tables in a new dataset
     +materialized: table
-    +schema: analytics
+    +schema: prod
+
+# snapshots:
+#   game_stats:
+#     +target_schema: prod
 
 seeds:
   game_stats:
-    +schema: analytics
+    +schema: prod

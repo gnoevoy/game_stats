@@ -1,0 +1,26 @@
+snapshots:
+
+  - name: player_actions
+    relation: source('jaffle_shop', 'orders')
+    config:
+      schema: snapshots
+      database: prod
+      unique_key: id
+      strategy: check
+      updated_at: updated_at
+      dbt_valid_to_current: "to_date('9999-12-31')"
+
+  - name: string
+    relation: relation # source('my_source', 'my_table') or ref('my_model')
+    description:  markdown_string
+    config:
+      database: string
+      schema: string
+      alias: string
+      strategy: timestamp | check
+      unique_key: column_name_or_expression
+      check_cols: [column_name] | all
+      updated_at: column_name
+      snapshot_meta_column_names: dictionary
+      dbt_valid_to_current: string
+      hard_deletes: ignore | invalidate | new_record 

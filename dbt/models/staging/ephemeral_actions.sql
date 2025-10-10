@@ -1,4 +1,4 @@
--- Player actions for the last 30 days
+{{ config(materialized='ephemeral') }}
 
 with cte as (
     select
@@ -19,5 +19,3 @@ from cte as t1
 -- Join actions table to display action ID instead of action name
 left join {{ ref('actions') }} as t2
     on t1.action = t2.action
-order by t1.player_id asc, t2.action_id asc
-
