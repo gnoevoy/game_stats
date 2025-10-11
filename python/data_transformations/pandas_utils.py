@@ -40,25 +40,13 @@ def transform_players_data(df):
     return df
 
 
-def transform_player_names(df):
-    values = df["value"].str.split("\n")
-    df["name"] = values.str[1].str.strip()
-
-    # Add timezone aware datetime column to store proper UTC time in BigQuery
-    df["last_used"] = pd.to_datetime(values.str[3].str.strip())
-    df["last_used"] = df["last_used"].dt.tz_localize(server_timezone)
-
-    df = df.drop(columns=["value"])
-    return df
-
-
 def transform_player_actions(df):
     values = df["action"].str.split("\n")
     df["action_name"] = values.str[1].str.strip()
     df["value"] = values.str[2].str.replace(",", "").astype(int)
 
     # Remove unwanted actions
-    actions_to_remove = ["Touch a Hostage", "Rescue a Hostage", "Headshot"]
+    actions_to_remove = ["Touch a Hostage", "Rescue a Hostage", "Headshot", "Domination"]
     df = df[~df["action_name"].isin(actions_to_remove)]
 
     # Rename actions names

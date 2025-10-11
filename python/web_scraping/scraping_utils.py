@@ -25,15 +25,6 @@ def get_general_info(player_id, home_page, timestamp):
     left_table = tables[0].find_all("tr")
     right_table = tables[1].find_all("tr")
 
-    # Get player used names, if they exist
-    names = []
-    if len(tables) > 8:
-        names_table = tables[8].find_all("tr")
-        for row in names_table[1:]:
-            value = row.text.strip()
-            name = {"player_id": player_id, "value": value, "timestamp": timestamp}
-            names.append(name)
-
     dct = {
         "player_id": player_id,
         "player_name": left_table[1].text.strip(),
@@ -46,7 +37,7 @@ def get_general_info(player_id, home_page, timestamp):
         "frags_per_minute": right_table[4].text.strip(),
         "timestamp": timestamp,
     }
-    return dct, names
+    return dct
 
 
 # Get player actions for the last 30
@@ -203,7 +194,7 @@ def get_my_games_events(player_id, home_page, timestamp):
 
 # Combine all helper functions to scrape my profile stats
 def get_my_profile_data(player_id, home_page, timestamp):
-    general_info, names = get_general_info(player_id, home_page, timestamp)
+    general_info = get_general_info(player_id, home_page, timestamp)
     actions, ct_side_peaks, t_side_peaks = get_player_actions(player_id, home_page, timestamp)
     weapons = get_weapons_stats(player_id, home_page, timestamp)
     frags = get_frags_stats(player_id, home_page, timestamp)
@@ -214,4 +205,4 @@ def get_my_profile_data(player_id, home_page, timestamp):
     general_info["CT_side_peaks"] = ct_side_peaks
     general_info["T_side_peaks"] = t_side_peaks
 
-    return general_info, names, actions, weapons, frags, sessions, events
+    return general_info, actions, weapons, frags, sessions, events

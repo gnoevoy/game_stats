@@ -17,14 +17,13 @@ def get_players_stats():
     logger.info(f"Extracted {len(links)}/100 records")
 
     HOME_PAGE = os.getenv("BASE_URL")
-    players, names, actions, weapons, frags = [], [], [], [], []
+    players, actions, weapons, frags = [], [], [], []
     timestamp = datetime.now(timezone.utc)
 
     # Extract my own stats first, since I could not be present in the top 100 players
     my_id = 4720
-    general_info, my_names, my_actions, my_weapons, my_frags, sessions, events = get_my_profile_data(my_id, HOME_PAGE, timestamp)
+    general_info, my_actions, my_weapons, my_frags, sessions, events = get_my_profile_data(my_id, HOME_PAGE, timestamp)
     players.append(general_info)
-    names.extend(my_names)
     actions.extend(my_actions)
     weapons.extend(my_weapons)
     frags.extend(my_frags)
@@ -41,7 +40,7 @@ def get_players_stats():
                 logger.info(f"{i}/100, skipping my profile")
                 continue
 
-            player_info, player_names = get_general_info(player_id, HOME_PAGE, timestamp)
+            player_info = get_general_info(player_id, HOME_PAGE, timestamp)
             player_actions, ct_side_peaks, t_side_peaks = get_player_actions(player_id, HOME_PAGE, timestamp)
             player_weapons = get_weapons_stats(player_id, HOME_PAGE, timestamp)
             player_frags = get_frags_stats(player_id, HOME_PAGE, timestamp)
@@ -52,7 +51,6 @@ def get_players_stats():
 
             # Append values
             players.append(player_info)
-            names.extend(player_names)
             actions.extend(player_actions)
             weapons.extend(player_weapons)
             frags.extend(player_frags)
@@ -64,7 +62,6 @@ def get_players_stats():
 
     # Write data to the bucket
     write_to_bucket("raw/players.csv", pd.DataFrame(players), "csv")
-    write_to_bucket("raw/names.csv", pd.DataFrame(names), "csv")
     write_to_bucket("raw/actions.csv", pd.DataFrame(actions), "csv")
     write_to_bucket("raw/weapons.csv", pd.DataFrame(weapons), "csv")
     write_to_bucket("raw/frags.csv", pd.DataFrame(frags), "csv")

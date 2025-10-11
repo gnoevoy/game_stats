@@ -1,6 +1,5 @@
 from pandas_utils import (
     transform_players_data,
-    transform_player_names,
     transform_player_actions,
     transform_player_weapons,
     transform_player_frags,
@@ -19,7 +18,6 @@ def transform_tables():
 
     data = [
         ["players", transform_players_data],
-        ["names", transform_player_names],
         ["actions", transform_player_actions],
         ["weapons", transform_player_weapons],
         ["frags", transform_player_frags],
@@ -46,7 +44,7 @@ def transform_tables():
 # Load cleaned csv files to BigQuery
 def load_to_bigquery():
     logger.info("LOADING DATA TO BIGQUERY")
-    tables = ["players", "names", "actions", "weapons", "frags", "sessions", "events"]
+    tables = ["players", "actions", "weapons", "frags", "sessions", "events"]
 
     for table in tables:
         write_to_bigquery(f"clean/{table}.csv", table)

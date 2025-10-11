@@ -16,8 +16,8 @@ services:
       dockerfile: Dockerfile.scraping
     <<: *secrets
 
-  pandas:
-    image: pandas
+  data_transformations:
+    image: data_transformations
     build:
       context: ./python
       dockerfile: Dockerfile.pandas
