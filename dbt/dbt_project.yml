@@ -17,9 +17,9 @@ models:
     +materialized: table
     +schema: prod
 
-# snapshots:
-#   game_stats:
-#     +target_schema: prod
+snapshots:
+  game_stats:
+    +schema: prod
 
 seeds:
   game_stats:

@@ -1,4 +1,8 @@
--- Player actions for the last 30 days
+-- Table that store history of player actions 
+
+{% snapshot player_actions %}
+
+{{ config( unique_key='player_id', strategy='check', check_cols=["action_id", 'value']) }}
 
 with cte as (
     select
@@ -17,7 +21,8 @@ select
     t1.created_at,
 from cte as t1
 -- Join actions table to display action ID instead of action name
-left join {{ ref('actions') }} as t2
+left join {{ ref('actions') }} AS t2
     on t1.action = t2.action
 order by t1.player_id asc, t2.action_id asc
 
+{% endsnapshot %}

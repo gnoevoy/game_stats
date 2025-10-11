@@ -1,6 +1,6 @@
 -- Player weapons stats for the last 30 days
 
-with cte as (
+{# with cte as (
     select
         player_id,
         weapon_id, 
@@ -14,5 +14,5 @@ with cte as (
 
 select *
 from cte
-order by player_id asc, weapon_id asc
+order by player_id asc, weapon_id asc #}
 

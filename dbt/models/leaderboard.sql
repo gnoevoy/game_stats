@@ -14,6 +14,7 @@ select
     last_30_days_headshots,
     CT_side_peaks as ct_side_peaks_for_last_30_days,
     T_side_peaks as t_side_peaks_for_last_30_days,
+    {{ poland_time("timestamp") }} as created_at,
 from {{ source('game_stats', 'players') }} 
 order by rank asc
 
