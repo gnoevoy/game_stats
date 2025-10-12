@@ -1,35 +1,33 @@
 # Configuration file for Google Cloud Workflows
-# Running sequntially Docker containers
 
 main:
   steps:
-    # Set env variables
+
+    # Use env variables from Cloud Build
+
     - init:
         assign:
-          - project_id: ${sys.get_env("GOOGLE_CLOUD_PROJECT_ID")}
-          - region: europe-central2
+          - project_id: ${sys.get_env("PROJECT_ID")}
+          - region: ${sys.get_env("DEPLOY_REGION")}
 
-    # Chain python and dbt scripts
+    # Run sequentially Docker containers deployed as Cloud Run Jobs
 
     - web_scraping:
         call: googleapis.run.v1.namespaces.jobs.run
         args:
-          name: ${"namespaces/" + project_id + "/jobs/" + "web-scraping"}
+          name: ${"namespaces/" + project_id + "/jobs/" + "game-stats-web-scraping"}
           location: ${region}
-        result: web_scraping_result
-        next: pandas_transformations
+        next: data_transformations
 
-    - pandas_transformations:
+    - data_transformations:
         call: googleapis.run.v1.namespaces.jobs.run
         args:
-          name: ${"namespaces/" + project_id + "/jobs/" + "pandas-transformations"}
+          name: ${"namespaces/" + project_id + "/jobs/" + "game-stats-data-transformations"}
           location: ${region}
-        result: pandas_transformations_result
         next: dbt
-    
+
     - dbt:
         call: googleapis.run.v1.namespaces.jobs.run
         args:
-          name: ${"namespaces/" + project_id + "/jobs/" + "dbt"}
-          location: ${region}     
-        result: dbt_result
+          name: ${"namespaces/" + project_id + "/jobs/" + "game-stats-dbt"}
+          location: ${region}
