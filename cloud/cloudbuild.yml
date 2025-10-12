@@ -2,83 +2,112 @@
 
 steps:
 
-  # Build 
+  # # Build Docker images
 
-  - id: "Build web-scraping image" 
-    name: gcr.io/cloud-builders/docker
-    args: ["build", "-f", "Dockerfile.scraping", "-t", "$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/web-scraping:$COMMIT_SHA", "."]
-    dir: "python/"
+  # - id: "Build web_scraping image" 
+  #   name: gcr.io/cloud-builders/docker
+  #   args: ["build", "-f", "Dockerfile.scraping", "-t", "$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/web_scraping:$COMMIT_SHA", "."]
+  #   dir: "python/"
 
-  - id: "Build data-transformations image" 
-    name: gcr.io/cloud-builders/docker
-    args: ["build", "-f", "Dockerfile.pandas", "-t", "$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/data-transformations:$COMMIT_SHA", "."]
-    dir: "python/"
+  # - id: "Build data_transformations image" 
+  #   name: gcr.io/cloud-builders/docker
+  #   args: ["build", "-f", "Dockerfile.pandas", "-t", "$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/data_transformations:$COMMIT_SHA", "."]
+  #   dir: "python/"
 
-  - id: "Build dbt image" 
-    name: gcr.io/cloud-builders/docker
-    args: ["build", "-t", "$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/dbt:$COMMIT_SHA", "."]
-    dir: "dbt/"
-
-
-  # Pushing images to Artifact Registry
-
-  - id: "Push web-scraping image" 
-    name: gcr.io/cloud-builders/docker
-    args: ["push", "$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/game_stats_scraping:$COMMIT_SHA"]
-
-  - id: "Push pandas-transformations image" 
-    name: gcr.io/cloud-builders/docker
-    args: ["push", "$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/game_stats_pandas:$COMMIT_SHA"]
-
-  - id: "Push dbt image" 
-    name: gcr.io/cloud-builders/docker
-    args: ["push", "$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/game_stats_dbt:$COMMIT_SHA"]
+  # - id: "Build dbt image" 
+  #   name: gcr.io/cloud-builders/docker
+  #   args: ["build", "-t", "$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/dbt:$COMMIT_SHA", "."]
+  #   dir: "dbt/"
 
 
-  # # Deploying containers to Cloud Run Jobs
+  # # Push images to Artifact Registry
 
-  # - id: "Deploy web-scraping container"
+  # - id: "Push web_scraping image to Registry" 
+  #   name: gcr.io/cloud-builders/docker
+  #   args: ["push", "$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/web_scraping:$COMMIT_SHA"]
+
+  # - id: "Push data_transformations image to Registry" 
+  #   name: gcr.io/cloud-builders/docker
+  #   args: ["push", "$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/data_transformations:$COMMIT_SHA"]
+
+  # - id: "Push dbt image to Registry" 
+  #   name: gcr.io/cloud-builders/docker
+  #   args: ["push", "$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/dbt:$COMMIT_SHA"]
+
+
+  # # Deploy containers to Cloud Run as Jobs
+
+  # - id: "Deploy web_scraping container"
   #   name: gcr.io/google.com/cloudsdktool/cloud-sdk
   #   entrypoint: gcloud
   #   args: [
-  #     "run", "jobs", "deploy", "web-scraping",
-  #     "--image", "$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/web-scraping:$COMMIT_SHA",
+  #     "run", "jobs", "deploy", "game-stats-web-scraping",
+  #     "--image", "$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/web_scraping:$COMMIT_SHA",
   #     "--region", "$_DEPLOY_REGION",
   #     "--project", "$PROJECT_ID",
-  #     "--max-retries=0",
+  #     # Job configuration
+  #     "--max-retries=1",
   #     "--task-timeout=30m",
-  #     "--set-env-vars=BUCKET_NAME=$_BUCKET_NAME,DATASET_NAME=$_DATASET_NAME,BASE_URL=$_BASE_URL,GOOGLE_CLOUD_PROJECT_ID=$PROJECT_ID"
+  #     "--cpu=2",
+  #     "--memory=1Gi",
+  #     # Provide env variables from cloudbuild
+  #     "--set-env-vars=BUCKET_NAME=$_BUCKET_NAME", 
+  #     "--set-env-vars=DATASET_NAME=$_DATASET_NAME",
+  #     "--set-env-vars=BASE_URL=$_BASE_URL",
+  #     "--set-env-vars=GOOGLE_CLOUD_PROJECT_ID=$PROJECT_ID",
   #   ]
 
-  # - id: "Deploy pandas-transformations container"
+  # - id: "Deploy data_transformations container"
   #   name: gcr.io/google.com/cloudsdktool/cloud-sdk
   #   entrypoint: gcloud
   #   args: [
-  #     "run", "jobs", "deploy", "pandas-transformations",
-  #     "--image", "$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/pandas-transformations:$COMMIT_SHA",
+  #     "run", "jobs", "deploy", "game-stats-data-transformations",
+  #     "--image", "$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/data_transformations:$COMMIT_SHA",
   #     "--region", "$_DEPLOY_REGION",
   #     "--project", "$PROJECT_ID",
+  #     # Job configuration
   #     "--max-retries=1",
-  #     "--set-env-vars=BUCKET_NAME=$_BUCKET_NAME,DATASET_NAME=$_DATASET_NAME,BASE_URL=$_BASE_URL,GOOGLE_CLOUD_PROJECT_ID=$PROJECT_ID"
+  #     "--task-timeout=10m",
+  #     "--cpu=2",
+  #     "--memory=1Gi",
+  #     # Provide env variables from cloudbuild
+  #     "--set-env-vars=BUCKET_NAME=$_BUCKET_NAME", 
+  #     "--set-env-vars=DATASET_NAME=$_DATASET_NAME",
+  #     "--set-env-vars=BASE_URL=$_BASE_URL",
+  #     "--set-env-vars=GOOGLE_CLOUD_PROJECT_ID=$PROJECT_ID",
   #   ]
 
   # - id: "Deploy dbt container"
   #   name: gcr.io/google.com/cloudsdktool/cloud-sdk
   #   entrypoint: gcloud
   #   args: [
-  #     "run", "jobs", "deploy", "dbt",
+  #     "run", "jobs", "deploy", "game-stats-dbt",
   #     "--image", "$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/dbt:$COMMIT_SHA",
   #     "--region", "$_DEPLOY_REGION",
   #     "--project", "$PROJECT_ID",
+  #     # Job configuration
   #     "--max-retries=1",
-  #     "--set-env-vars=GOOGLE_CLOUD_PROJECT_ID=$PROJECT_ID,DATASET_NAME=$_DATASET_NAME"
+  #     "--task-timeout=10m",
+  #     "--cpu=2",
+  #     "--memory=1Gi",
+  #     # Provide env variables from cloudbuild
+  #     "--set-env-vars=DATASET_NAME=$_DATASET_NAME",
+  #     "--set-env-vars=GOOGLE_CLOUD_PROJECT_ID=$PROJECT_ID",
   #   ]
 
 
-  # # Update YAML file for Workflows
-  # - id: "Update YAML file to Workflows"
-  #   name: 'gcr.io/cloud-builders/gcloud'
-  #   args: ['workflows', 'deploy', '$_WORKFLOW_NAME', '--source', 'cloud/workflow.yml', "--location", "$_DEPLOY_REGION"]   
+  # Update Workflows YAML file
+
+  - id: "Update Workflows YAML file"
+    name: 'gcr.io/cloud-builders/gcloud'
+    args: [
+      'workflows', 'deploy', '$_WORKFLOW_NAME',
+      '--source', 'cloud/workflow.yml',
+      "--location", "$_DEPLOY_REGION",
+      "--set-env-vars=PROJECT_ID=$PROJECT_ID",
+      "--set-env-vars=DEPLOY_REGION=$_DEPLOY_REGION",
+    ]   
+
 
 options:
   logging: CLOUD_LOGGING_ONLY

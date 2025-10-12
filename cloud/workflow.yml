@@ -1,4 +1,5 @@
-# Configuration file that defines a sequence of jobs executed in Google Cloud Workflows.
+# Configuration file for Google Cloud Workflows
+# Running sequntially Docker containers
 
 main:
   steps:
