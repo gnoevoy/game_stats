@@ -6,6 +6,7 @@ COPY requirements.txt .
 
 RUN pip install --no-cache-dir --upgrade -r requirements.txt
 
-COPY . .
+COPY web_scraping ./web_scraping
+COPY gcp_utils.py .
 
 CMD [ "python", "web_scraping/main.py" ]

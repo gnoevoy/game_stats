@@ -81,7 +81,7 @@ def transform_player_frags(df):
     df["kills"] = values.str[2].str.replace(",", "").astype(int)
     df["deaths"] = values.str[5].str.replace(",", "").astype(int)
     df["headshots"] = values.str[9].str.replace(",", "").astype(int)
-    df = df.drop(columns=["value"])
+    df = df.drop(columns=["value"]).drop_duplicates()
     return df
 
 
