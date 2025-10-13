@@ -2,13 +2,11 @@
 
 **Subject:** Player statistics and leaderboard data for an FPS game server.
 
-**Problem:**  
-The game server’s website displays only **current player stats** (recent activity and rankings), with no historical data.  
-As a result, it’s impossible to track performance over time, identify trends, or compare player progress.
+**Needs:** Track players data over time to monitor performance and identify trends.
 
-**Solution:** 
-1. **Develop a data pipeline** that collects and stores historical data in a warehouse, ensuring long-term access to player performance records.
-2. **Deliver insights** through interactive dashboards in Power BI and detailed reports in Excel.
+**Problem:** The server’s website only shows recent activity, with no historical records — making long-term analysis and comparisons impossible.
+
+**Solution:** Build a data pipeline that collects and stores historical data in a warehouse, enabling analytics through reports and dashboards.
 
 **Used Tools:** `Python`, `SQL`, `dbt`, `BigQuery`, `Google Cloud`, `Excel`, `Power BI`, `Docker`, `Git`
 
@@ -18,7 +16,7 @@ As a result, it’s impossible to track performance over time, identify trends, 
 
 # Data Pipeline
 
-As a result, the pipeline automatically collects raw data from the website and stores it as analytics-ready datasets in `BigQuery`. Each run processes around 3–5 MB of data and is scheduled to run weekly.
+The pipeline runs weekly in the cloud, processing about 3–5 MB of data per run. It collects raw data from the website, transforms it, and stores the results in `BigQuery` as the central data warehouse.
 
 ![Database Schema](images/schema.jpg)
 
@@ -27,9 +25,9 @@ As a result, the pipeline automatically collects raw data from the website and s
 | Challenge | Description |
 |-----------|-------------|
 | **Understanding the data source** | Identifying how the website generates player stats, determining which metrics matter, and selecting only the most relevant data using domain knowledge. |
-| **Web scraping** | Without an API, data had to be scraped from web pages — an iterative, hard-to-test process that often led to bugs. |
+| **Web scraping** | Since there’s no API, data had to be scraped directly from the website — a clumsy, quire iterative and error-prone process. |
 | **Time zone handling** | Converting timestamps correctly across different time zones to ensure accurate data. |
-| **Data modeling** | Designing an efficient schema in `dbt` and implementing slowly changing dimensions to preserve historical player data. |
+| **Data modeling** | Building a well-structured and efficient `dbt` models to organize and store historical player records. |
 
 <br>
 
@@ -80,4 +78,4 @@ For orchestration and scheduling was chosen Google Cloud services over Airflow b
 
 # Analytics
 
-coming soon...
+coming soon ...
