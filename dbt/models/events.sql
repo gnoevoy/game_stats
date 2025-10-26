@@ -6,6 +6,7 @@
 with cte as (
    select
         {{ poland_time("timestamp") }} as created_at,
+        {{ poland_time("event_timestamp") }} as event_timestamp,
         event_index,
         t2.event_type_id,
         description, 
@@ -20,5 +21,5 @@ select *
 from cte
 -- Filter incremental runs
 {% if is_incremental() %}
-    where created_at > (select max(created_at) from {{ this }})
+    where event_timestamp > (select max(event_timestamp) from {{ this }})
 {% endif %}
