@@ -1,0 +1,11 @@
+analytics:
+  outputs:
+    prod:
+      method: oauth
+      dataset: game_stats_my_performance
+      project: "{{ env_var('GOOGLE_CLOUD_PROJECT_ID') }}"
+      threads: 64
+      location: EU
+      type: bigquery
+
+  target: prod

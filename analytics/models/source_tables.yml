@@ -1,0 +1,11 @@
+version: 2
+
+sources:
+  - name: game_stats_prod
+    database: "{{ env_var('GOOGLE_CLOUD_PROJECT_ID') }}"
+    schema: "{{ env_var('DATASET_NAME') }}"
+    tables:
+      - name: sessions
+      - name: leaderboard_history
+      - name: events
+      - name: event_types
