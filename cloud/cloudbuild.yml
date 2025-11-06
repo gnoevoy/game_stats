@@ -7,17 +7,17 @@ steps:
   - id: "Build web_scraping image" 
     name: gcr.io/cloud-builders/docker
     args: ["build", "-f", "Dockerfile.scraping", "-t", "$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/web_scraping:$COMMIT_SHA", "."]
-    dir: "python/"
+    dir: "pipeline/python/"
 
   - id: "Build data_transformations image" 
     name: gcr.io/cloud-builders/docker
     args: ["build", "-f", "Dockerfile.pandas", "-t", "$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/data_transformations:$COMMIT_SHA", "."]
-    dir: "python/"
+    dir: "pipeline/python/"
 
   - id: "Build dbt image" 
     name: gcr.io/cloud-builders/docker
     args: ["build", "-t", "$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPO/dbt:$COMMIT_SHA", "."]
-    dir: "dbt/"
+    dir: "pipeline/dbt/"
 
 
   # Push images to Artifact Registry

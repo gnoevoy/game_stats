@@ -2,8 +2,10 @@ with source_data as (
     select 
         date,
         extract(month from date) as month,
+        format_datetime("%B", date) as month_name,
         extract(week from date) as week,
         extract(dayofweek from date) as day,
+        format_date('%A', date) AS day_name,
 
         kills,
         deaths,
@@ -25,8 +27,8 @@ all_time_stats as (
         coalesce(round(safe_divide(headshots, kills),2 ), 1) as all_time_hs_ratio,
         coalesce(round(safe_divide(kills, deaths),2 ), 1) as all_time_KDR,
         frags_per_minute as all_time_kills_per_minute,
-    from {{ source('game_stats_prod', 'leaderboard_history') }}
-    where player_id = 4720 and dbt_valid_to is null
+    from {{ source('game_stats_prod', 'leaderboard') }}
+    where player_id = 4720
 )
 
 

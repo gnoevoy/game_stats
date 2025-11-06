@@ -1,7 +1,7 @@
 # Load env variables and secrets on runtime for python scripts
 x-secrets: &secrets
   env_file:
-    - ./python/.env
+    - ./pipeline/python/.env
   volumes:
     - ./gcloud_key.json:/script/gcloud_key.json
   environment:
@@ -12,26 +12,26 @@ services:
   web_scraping:
     image: web_scraping
     build:
-      context: ./python
+      context: ./pipeline/python
       dockerfile: Dockerfile.scraping
     <<: *secrets
 
   data_transformations:
     image: data_transformations
     build:
-      context: ./python
+      context: ./pipeline/python
       dockerfile: Dockerfile.pandas
     <<: *secrets
 
   dbt:
     image: dbt
     build:
-      context: ./dbt
+      context: ./pipeline/dbt
       dockerfile: Dockerfile
 
     # Load env variables and secrets on runtime
     env_file:
-      - ./dbt/.env
+      - ./pipeline/dbt/.env
     volumes:
       - ./gcloud_key.json:/root/gcloud_key.json
     environment:
