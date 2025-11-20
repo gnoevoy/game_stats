@@ -1,5 +1,6 @@
 with source_data as (
     select 
+        -- date values
         date,
         extract(month from date) as month,
         format_datetime("%B", date) as month_name,
@@ -10,30 +11,33 @@ with source_data as (
         kills,
         deaths,
         headshots,
-        coalesce(round(safe_divide(headshots, kills),2 ), 1) as hs_ratio,
-        coalesce(round(safe_divide(kills, deaths),2 ), 1) as KDR,
-
         collected_experience as collected_exp,
         time_played_in_minutes,
-        round(collected_experience / time_played_in_minutes, 2) as exp_per_minute,
-        coalesce(round(safe_divide(kills, time_played_in_minutes),2 ), 0) as kills_per_minute,
+
+        -- calculated metrics using macros
+        {{ calculate_ratio('headshots', 'kills', 2) }} as hs_ratio,
+        {{ calculate_ratio('kills', 'deaths', 2) }} as KDR,
+        {{ calculate_ratio('collected_experience', 'time_played_in_minutes', 2) }} as exp_per_minute,
+        {{ calculate_ratio('kills', 'time_played_in_minutes', 2) }} as kills_per_minute,    
 
     from {{ source('game_stats_prod', 'sessions') }}
+    -- remove empty records
     where time_played_in_minutes > 0
 ),
 
-all_time_stats as (
+my_all_time_stats as (
     select
-        coalesce(round(safe_divide(headshots, kills),2 ), 1) as all_time_hs_ratio,
-        coalesce(round(safe_divide(kills, deaths),2 ), 1) as all_time_KDR,
+        {{ calculate_ratio('headshots', 'kills', 2) }} as all_time_hs_ratio,
+        {{ calculate_ratio('kills', 'deaths', 2) }} as all_time_KDR,
         frags_per_minute as all_time_kills_per_minute,
     from {{ source('game_stats_prod', 'leaderboard') }}
+    -- select only my stats
     where player_id = 4720
 )
 
 
 select *,
-    case when time_played_in_minutes <= 30 then "0-30 min"
+    case when time_played_in_minutes <= 30 then "1-30 min"
         when time_played_in_minutes <= 60 then "31-60 min"
         when time_played_in_minutes <= 120 then "61-120 min"
         else "120+ min" end as session_length,
@@ -43,7 +47,7 @@ select *,
         else 'average' end as session_quality,
 
 from source_data
-cross join all_time_stats
+cross join my_all_time_stats
 order by date desc
 
 
