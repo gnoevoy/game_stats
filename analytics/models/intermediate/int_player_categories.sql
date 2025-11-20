@@ -1,4 +1,6 @@
--- create buckets for weapons
+-- Leaderboard table with player categories based on weapon usage
+
+-- create bucket for each weapon
 with weapon_categories as (
     select *, 
         case when weapon_name in ('ak47', 'aug', 'famas', 'galil', 'm4a1', 'sg552') then 'rifle'
@@ -13,26 +15,29 @@ with weapon_categories as (
     from {{ source('game_stats_prod', 'weapons') }}
 ),
 
+-- calculate total kills per weapon category for each player with kills ratio
 weapon_usage as (
     select *,
-        -- calculate kills ration for each weapon category per player
+        -- calculate kills ratio per weapon category
         round(total_kills / sum(total_kills) over (partition by player_id), 2 ) as kills_ratio
     from (
-        -- aggregate kills by player and weapon category
         select 
-            player_id, weapon_category, sum(kills) as total_kills
+            player_id, 
+            weapon_category,
+            sum(kills) as total_kills
         from {{ source('game_stats_prod', 'player_weapons') }} as t1
         -- access weapon categories
         left join weapon_categories as t2
             on t1.weapon_id = t2.weapon_id
+        -- filter out to most recent records
         where dbt_valid_to is null
         group by 1, 2 
     )
 ),
 
+-- create for each player weapon category
 player_categories as(
     select *,
-        -- create player buckets
         case when rifle_kills_ratio >= 0.7 then "rifle_strong"
             when sniper_kills_ratio >= 0.7 then "sniper_strong"
             when sniper_kills_ratio >= 0.5 and (sniper_kills_ratio - rifle_kills_ratio) >= 0.2 then "sniper_soft"
@@ -48,12 +53,16 @@ player_categories as(
     )
 ),
 
+-- join player categories to leaderboard stats
 top_players as (
     select
         t1.player_id,
+        player_name,
         rank,
         player_category,
         frags_per_minute,
+
+        -- use macros to calculate ratios
         {{ calculate_ratio('headshots', 'kills', 2) }} as hs_ratio,
         {{ calculate_ratio('kills', 'deaths', 2) }} as KDR,
 
@@ -64,25 +73,3 @@ top_players as (
 
 select *
 from top_players
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
