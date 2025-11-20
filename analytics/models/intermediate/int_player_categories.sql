@@ -73,3 +73,4 @@ top_players as (
 
 select *
 from top_players
+order by rank asc
