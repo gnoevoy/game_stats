@@ -6,7 +6,7 @@
 
 **Problem:** The server’s website only shows recent activity, with no historical records — making long-term analysis and comparisons impossible.
 
-**Solution:** Build a data pipeline that collects and stores historical data in a warehouse, enabling analytics through reports and dashboards.
+**Solution:** Build a data pipeline that regularly collects leaderboard data and stores it in a warehouse, creating a complete historical dataset for analytics and reporting.
 
 **Used Tools:** `Python`, `SQL`, `dbt`, `BigQuery`, `Google Cloud`, `Excel`, `Power BI`, `Docker`, `Git`
 
@@ -16,7 +16,7 @@
 
 # Data Pipeline
 
-The pipeline runs weekly in the cloud, processing about 3–5 MB of data per run. It collects raw data from the website, transforms it, and stores the results in `BigQuery` as the central data warehouse.
+The pipeline runs on a scheduled interval  in the cloud, processing roughly 3–5 MB of data per execution. It collects raw leaderboard data from the website, cleans and transforms it, and loads the final results into `BigQuery` as the central data warehouse. Below is the schema of the final analytics-ready tables produced by the pipeline.
 
 ![Database Schema](images/schema.jpg)
 
@@ -35,18 +35,18 @@ The pipeline runs weekly in the cloud, processing about 3–5 MB of data per run
 
 ![Pipeline Logic](images/pipeline.jpg)
 
-The pipeline is split into **three Docker containers** — one for **web scraping**, one for **data processing and loading to BigQuery**, and one for **dbt transformations** that produce the final analytics tables.
+The ETL pipeline is divided into three independent stages, each running in its own Docker container with separated logic: one handles web scraping, one processes the data and loads it into BigQuery, and one runs dbt transformations to produce the final analytics tables.
 
 ### Python  
-- Extracts data from web pages using `requests` and `BeautifulSoup`.  
-- Uses `Google Cloud` libraries to read and write data to `Cloud Storage` and `BigQuery`.  
-- Cleans and transforms data with `pandas`, handling operations not easily done in SQL.
+- Web scraping handled with `requests` and `BeautifulSoup`.
+- Used `Google Cloud` libraries to read and write data to `Cloud Storage` and `BigQuery`.  
+- Data cleaning and transformation performed with `pandas`.
 
 ### dbt  
-- Defines reusable logic through `macros`.  
-- Manages small, rarely changing datasets with `seeds`.  
-- Builds `incremental models` to efficiently append or update data.  
-- Uses `snapshots` to capture and preserve historical changes.
+- `Macros` provide reusable SQL logic across models.
+- `Seeds` store small, static reference datasets.
+- Used `incremental models` to append/update data efficiently.
+- Used `snapshots` to preserve historical changes.
 
 
 <br>
@@ -56,7 +56,6 @@ The pipeline is split into **three Docker containers** — one for **web scrapin
 For orchestration and scheduling was chosen Google Cloud services over Airflow because:
 - **Lower cost** — Serverless tools like `Cloud Run Jobs` and `Workflows` cost far less than Composer or Astronomer.  
 - **Easy deployment** — Running Docker containers in the cloud is simpler than managing Airflow setups.  
-- **Right fit** — Airflow is more advanced than needed; retries, env variables, and basic logic are easily handled in Google Cloud or Python.  
 - **Native integration** — Works seamlessly with `BigQuery`, `Cloud Storage`, and other Google services.  
 - **No maintenance** — Fully managed, scalable, and requires zero infrastructure management.
 

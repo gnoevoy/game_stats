@@ -42,7 +42,7 @@ def get_players_links():
             players.extend(links)
         else:
             logger.error(f"Failed to retrieve page {page_num}: {response.status_code}")
-            break
+            raise
 
         page_num += 1
 

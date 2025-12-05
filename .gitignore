@@ -15,4 +15,4 @@ logs/
 *.json
 
 # Others
-plan.txt
+*.txt
