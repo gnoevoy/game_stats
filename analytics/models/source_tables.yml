@@ -6,8 +6,8 @@ sources:
     schema: "{{ env_var('DATASET_NAME') }}"
     tables:
       - name: sessions
-      - name: leaderboard
       - name: leaderboard_history
+      - name: leaderboard
       - name: player_weapons
       - name: weapons
       - name: events

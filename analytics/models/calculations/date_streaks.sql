@@ -1,4 +1,4 @@
-with source as (
+{# with source as (
     select
         date,
         session_quality,
@@ -46,4 +46,4 @@ streak_lengths as (
 
 select *
 from streak_lengths
-order by date desc
+order by date desc #}

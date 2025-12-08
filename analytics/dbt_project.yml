@@ -15,3 +15,9 @@ clean-targets:
 models:
   analytics:
     +materialized: table
+
+    # Create seperate schemas for each model group
+    calculations:
+      +schema: calculations          
+    results:
+      +schema: analytics

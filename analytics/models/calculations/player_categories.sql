@@ -1,4 +1,4 @@
--- Leaderboard table with player categories based on weapon usage
+-- Leaderboard with player categories based on weapon usage
 
 -- create bucket for each weapon
 with weapon_categories as (
@@ -35,7 +35,7 @@ weapon_usage as (
     )
 ),
 
--- create for each player weapon category
+-- create for each player weapon category (buckets)
 player_categories as(
     select *,
         case when rifle_kills_ratio >= 0.7 then "rifle_strong"

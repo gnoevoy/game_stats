@@ -25,10 +25,20 @@ with source_data as (
     from {{ source('game_stats_prod', 'sessions') }}
     -- remove empty records
     where time_played_in_minutes > 0
+),
+
+-- get my all time metrics
+my_stats as (
+    select
+        {{ calculate_ratio('headshots', 'kills', 2) }} as all_time_hs_ratio,
+        {{ calculate_ratio('kills', 'deaths', 2) }} as all_time_KDR,
+        frags_per_minute as all_time_kills_per_minute,
+    from {{ source('game_stats_prod', 'leaderboard_history') }}
+    where player_id = 4720 and dbt_valid_to is null
 )
 
 select *,
-    -- bucket for session length and performance
+    -- buckets for session length and performance
     case when time_played_in_minutes <= 30 then "1-30 min"
         when time_played_in_minutes <= 60 then "31-60 min"
         when time_played_in_minutes <= 120 then "61-120 min"
@@ -38,7 +48,9 @@ select *,
         when hs_ratio < 0.6 or KDR < 1.5 then 'bad'
         else 'average' end as session_quality,
 
-from source_data
+from source_data as t1
+-- append my all time stats to each row
+cross join my_stats as t2
 order by date desc
 
 
