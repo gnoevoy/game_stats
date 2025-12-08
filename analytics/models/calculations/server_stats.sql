@@ -1,6 +1,6 @@
 -- Server stats for top 100 current players
 
--- calculate max and avg stats per player category
+-- Calculate max and avg stats per player category
 with category_stats as (
     select player_category,
         count(*) as player_count,
@@ -14,7 +14,7 @@ with category_stats as (
     group by 1 
 ),
 
--- calculate 75th percentile stats
+-- Calculate 75th percentile stats
 percentile_stats as (
     select
         distinct player_category,

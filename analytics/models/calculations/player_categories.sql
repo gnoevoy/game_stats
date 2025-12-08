@@ -1,6 +1,6 @@
 -- Leaderboard with player categories based on weapon usage
 
--- create bucket for each weapon
+-- Create bucket for each weapon
 with weapon_categories as (
     select *, 
         case when weapon_name in ('ak47', 'aug', 'famas', 'galil', 'm4a1', 'sg552') then 'rifle'
@@ -15,10 +15,10 @@ with weapon_categories as (
     from {{ source('game_stats_prod', 'weapons') }}
 ),
 
--- calculate total kills per weapon category for each player with kills ratio
+-- Calculate total kills per weapon category for each player
 weapon_usage as (
     select *,
-        -- calculate kills ratio per weapon category
+        -- Kills ratio per weapon category
         round(total_kills / sum(total_kills) over (partition by player_id), 2 ) as kills_ratio
     from (
         select 
@@ -35,7 +35,7 @@ weapon_usage as (
     )
 ),
 
--- create for each player weapon category (buckets)
+-- Create for each player game-style category
 player_categories as(
     select *,
         case when rifle_kills_ratio >= 0.7 then "rifle_strong"
@@ -53,7 +53,7 @@ player_categories as(
     )
 ),
 
--- join player categories to leaderboard stats
+-- Join player categories to leaderboard stats
 top_players as (
     select
         t1.player_id,

@@ -4,7 +4,7 @@ with source as (
     select
         week,
         count(*) as sessions_num,
-        -- flag to check if week is active
+        -- Flag to check if week is active
         case when count(*) > 1 then 1 else 0 end as is_active
 
     from {{ ref('sessions_source') }}

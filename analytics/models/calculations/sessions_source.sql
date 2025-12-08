@@ -49,15 +49,15 @@ extra_calculations as (
             when hs_ratio < 0.6 or KDR < 1.5 then 'bad'
             else 'average' end as session_quality,
 
-        -- net comparison to my all time stats
-        round((hs_ratio - all_time_hs_ratio) / all_time_hs_ratio * 100 , 2) as hs_ratio_vs_all_time_pct,
-        round((KDR - all_time_KDR) / all_time_KDR * 100 , 2) as kdr_vs_all_time_pct,
-        round((kills_per_minute - all_time_kills_per_minute) / all_time_kills_per_minute * 100 , 2) as kills_per_minute_vs_all_time_pct,
+        -- pct difference to my all time stats
+        {{ pct_difference('hs_ratio', 'all_time_hs_ratio') }} as hs_ratio_vs_all_time_pct,
+        {{ pct_difference('KDR', 'all_time_KDR') }} as kdr_vs_all_time_pct,
+        {{ pct_difference('kills_per_minute', 'all_time_kills_per_minute') }} as kills_per_minute_vs_all_time_pct,
 
         -- rolling averages over last 5 sessions
-        round(avg(hs_ratio) over (order by date rows between 4 preceding and current row), 2) as avg_hs_ratio_last_5_sessions,
-        round(avg(kdr) over (order by date rows between 4 preceding and current row), 2) as avg_kdr_last_5_sessions,
-        round(avg(kills_per_minute) over (order by date rows between 4 preceding and current row), 2) as avg_kills_per_minute_last_5_sessions,
+        {{ rolling_avg('hs_ratio', 'date') }} as avg_hs_ratio_last_5_sessions,
+        {{ rolling_avg('KDR', 'date') }} as avg_kdr_last_5_sessions,
+        {{ rolling_avg('kills_per_minute', 'date') }} as avg_kills_per_minute_last_5_sessions,
 
     from source_data as t1
     -- append my all time stats to each row

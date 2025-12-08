@@ -10,7 +10,7 @@ select
 
 from {{ ref('sessions_source') }} as t1
 
--- join streaks data
+-- Join streaks data
 left join {{ ref('date_streaks') }} as t2
     on t1.date = t2.date
 left join {{ ref('dedication_streaks') }} as t3

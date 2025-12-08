@@ -1,4 +1,4 @@
--- Calculate consecutive date streaks
+-- Calculate consecutive days streaks
 
 with source as (
     select date
