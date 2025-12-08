@@ -10,5 +10,3 @@ sources:
       - name: leaderboard
       - name: player_weapons
       - name: weapons
-      - name: events
-      - name: event_types
