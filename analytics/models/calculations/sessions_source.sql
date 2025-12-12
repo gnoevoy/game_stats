@@ -49,11 +49,6 @@ extra_calculations as (
             when hs_ratio < 0.6 or KDR < 1.5 then 'bad'
             else 'average' end as session_quality,
 
-        -- pct difference to my all time stats
-        {{ pct_difference('hs_ratio', 'all_time_hs_ratio') }} as hs_ratio_vs_all_time_pct,
-        {{ pct_difference('KDR', 'all_time_KDR') }} as kdr_vs_all_time_pct,
-        {{ pct_difference('kills_per_minute', 'all_time_kills_per_minute') }} as kills_per_minute_vs_all_time_pct,
-
         -- rolling averages over last 5 sessions
         {{ rolling_avg('hs_ratio', 'date') }} as avg_hs_ratio_last_5_sessions,
         {{ rolling_avg('KDR', 'date') }} as avg_kdr_last_5_sessions,
