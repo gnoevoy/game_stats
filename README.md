@@ -4,9 +4,11 @@
 
 **Needs:** Track players data over time to monitor performance and identify trends.
 
-**Problem:** The server’s website only shows recent activity, with no historical records — making long-term analysis and comparisons impossible.
+**Problem:** The server’s website only shows recent activity, with no historical records — making long-term analysis and comparisons difficult.
 
-**Solution:** Build a data pipeline that regularly collects leaderboard data and stores it in a warehouse, creating a complete historical dataset for analytics and reporting.
+**Solution:**
+1. Build a data pipeline that regularly collects leaderboard data and stores it in a warehouse, creating a complete historical dataset for analytics and reporting.
+2. Use the historical data to analyze performance, uncover trends, and communicate insights using BI tools.
 
 **Used Tools:** `Python`, `SQL`, `dbt`, `BigQuery`, `Google Cloud`, `Excel`, `Power BI`, `Docker`, `Git`
 
@@ -77,4 +79,30 @@ For orchestration and scheduling was chosen Google Cloud services over Airflow b
 
 # Analytics
 
-coming soon ...
+! not completed yet ...
+
+## Sessions
+
+**Aim**: Analyze my session-level gameplay data to identify performance trends, consistency patterns, and compare results against other players on the server.
+
+### dbt 
+
+- Used to build pre-calculated tables for BI tools, with **two separate datasets**: intermediate calculation models and final reporting tables  
+- Calculated key session and player metrics (KDR, headshot ratio, kills per minute, session quality), including **streaks**, rolling indicators, and **player categories** for comparison
+
+![Sessions tables](images/sessions.jpg)
+
+<br>
+
+## Events
+
+**Aim**: Analyze my deaths from AWP based on event-level data to spot trends over time and understand how AWP deaths correlate with my performance metrics across different dimensions.
+
+### Jupyter Notebook (pandas)
+
+- Used to create **pre-calculated tables** for BI analysis by aggregating events into session/day-level metrics and joining them with session duration data  
+- Built **two tables**: one with session-level metrics split by team side (deaths, AWP deaths, kills, headshots), and one with session timing and duration used as additional analytical dimensions
+
+![Events tables](images/events.jpg)
+
+<br>
