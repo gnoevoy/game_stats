@@ -7,10 +7,10 @@
 **Problem:** The server’s website only shows recent activity, with no historical records — making long-term analysis and comparisons difficult.
 
 **Solution:**
-1. Build a data pipeline that regularly collects leaderboard data and stores it in a warehouse, creating a complete historical dataset for analytics and reporting.
-2. Use the historical data to analyze performance, uncover trends, and communicate insights using BI tools.
+1. Build a data pipeline to collect and store leaderboard data in a warehouse.
+2. Use the historical dataset to analyze trends and evaluate player performance.
 
-**Used Tools:** `Python`, `SQL`, `dbt`, `BigQuery`, `Google Cloud`, `Excel`, `Power BI`, `Docker`, `Git`
+**Used Tools:** `Python`, `SQL`, `dbt`, `BigQuery`, `Google Cloud`, `Excel`, `Docker`, `Git`
 
 
 <br>
@@ -79,30 +79,30 @@ For orchestration and scheduling was chosen Google Cloud services over Airflow b
 
 # Analytics
 
-! not completed yet ...
+## AWP Death Impact Analysis
 
-## Sessions
+**Aim:** Analyze my session event data to understand the AWP death ratio across different dimensions and its impact on KDR and Headshot %. This is a simple exploratory analysis built to get quick insight into an interesting gameplay topic and understand general performance patterns.
 
-**Aim**: Analyze my session-level gameplay data to identify performance trends, consistency patterns, and compare results against other players on the server.
+### Data Processing (Python)
+- Used Python `pandas` library for transformation logic  
+- Applied custom functions to remove outlier events  
+- Identified session start and end to properly group data  
+- Built aggregated session-level and day-level models
 
-### dbt 
+![Events Model](images/events_model.png)
 
-- Used to build pre-calculated tables for BI tools, with **two separate datasets**: intermediate calculation models and final reporting tables  
-- Calculated key session and player metrics (KDR, headshot ratio, kills per minute, session quality), including **streaks**, rolling indicators, and **player categories** for comparison
+### Excel Analytics
+- Used Power Query to create new categorical columns  
+- Used Power Pivot with DAX measures to calculate AWP Death Ratio, KDR, and Headshot %  
+- Built pivot tables and charts with slicers to explore results
 
-![Sessions tables](images/sessions.jpg)
+![Events Charts](images/events_charts.png)
 
-<br>
+### Results & Conclusion
+- AWP deaths consistently range around **36–40%**  
+- No significant impact of AWP deaths on KDR or Headshot %  
+- Distribution remains stable across team side, daytime, and session duration  
 
-## Events
-
-**Aim**: Analyze my deaths from AWP based on event-level data to spot trends over time and understand how AWP deaths correlate with my performance metrics across different dimensions.
-
-### Jupyter Notebook (pandas)
-
-- Used to create **pre-calculated tables** for BI analysis by aggregating events into session/day-level metrics and joining them with session duration data  
-- Built **two tables**: one with session-level metrics split by team side (deaths, AWP deaths, kills, headshots), and one with session timing and duration used as additional analytical dimensions
-
-![Events tables](images/events.jpg)
+**Conclusion:** AWP deaths are evenly distributed and do not meaningfully affect overall performance.
 
 <br>
