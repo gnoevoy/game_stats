@@ -83,11 +83,13 @@ For orchestration and scheduling was chosen Google Cloud services over Airflow b
 
 **Aim:** Analyze my session event data to understand the AWP death ratio across different dimensions and its impact on KDR and Headshot %. This is a simple exploratory analysis built to get quick insight into an interesting gameplay topic and understand general performance patterns.
 
-### Data Processing (Python)
+### Data Processing
 - Used Python `pandas` library for transformation logic  
 - Applied custom functions to remove outlier events  
 - Identified session start and end to properly group data  
 - Built aggregated session-level and day-level models
+
+![Pandas Dataframe](images/pandas_tables.png)
 
 ![Events Model](images/events_model.png)
 
@@ -106,3 +108,25 @@ For orchestration and scheduling was chosen Google Cloud services over Airflow b
 **Conclusion:** AWP deaths are evenly distributed and do not meaningfully affect overall performance.
 
 <br>
+
+## Performance Trend & Player Category Comparison Analysis
+
+**Aim:** Quickly calculated aggregated tables to get a clear grasp of my performance patterns. The focus was on trend analysis of my session stats and comparison of my metrics against different player categories (play styles and skill tiers).
+
+### Data Processing
+- Used SQL and **dbt** to build reusable session-level models  
+- Implemented window functions to compute consecutive play-day streaks and good-session streaks  
+- Classified sessions into quality groups (good / average / bad)  
+- Ranked players into percentile tiers (Top 20% → Bottom 20%)  
+- Calculated percentage differences vs my baseline performance  
+
+![Sessions Table](images/sessions_table.png)
+
+![Trend Charts](images/trend_charts.png)
+
+![Player Categories Table](images/player_categories.png)
+
+**Conclusion:** Trend analysis reveals variability in short-term performance, while category comparison highlights structural differences in results depending on opponent strength and play style.
+
+<br>
+

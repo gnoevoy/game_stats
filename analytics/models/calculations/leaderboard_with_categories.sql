@@ -63,7 +63,7 @@ top_players as (
         frags_per_minute,
 
         -- use macros to calculate ratios
-        {{ calculate_ratio('headshots', 'kills', 2) }} as hs_ratio,
+        {{ calculate_ratio('headshots', 'kills', 2) }} as hs_pct,
         {{ calculate_ratio('kills', 'deaths', 2) }} as KDR,
 
     from {{ source('game_stats_prod', 'leaderboard') }} as t1
